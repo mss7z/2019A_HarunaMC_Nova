@@ -1,3 +1,7 @@
+//NIT,Akita College Robocon Akita
+//2019 A-team Haruna Movement Controller
+//Project Nova by mss7z
+
 #include "mbed.h"
 
 #include "aMotor.hpp"
