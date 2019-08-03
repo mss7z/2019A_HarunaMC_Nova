@@ -1,0 +1,5 @@
+#include "aPid.hpp"
+
+namespace __aPid_internal__{
+	//îﬂÇµÇ¢ê¢äE
+}
