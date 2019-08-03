@@ -1,8 +1,9 @@
 #include "mbed.h"
+
 #include "aMotor.hpp"
 #include "aXBee.hpp"
 #include "useful.hpp"
-#include "aGyro_imu03a.hpp"
+#include "aAeGyroSmd.hpp"
 
 /*Serial pc(USBTX,USBRX);
 DigitalOut led(LED1);*/
@@ -60,7 +61,7 @@ namespace emerg=emergency;
 namespace sensor{
 	//a_imu03a gyro(D11,D12,D13,D10);
 	//a_imu03a gyro(PB_15,PB_14,PB_13,PC_4);
-	a_imu03a gyro(PC_12,PC_11,PC_10,PD_2);
+	aAeGyroSmd gyro(A0,1.2);
 }
 
 namespace monitor{
