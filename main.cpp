@@ -43,6 +43,8 @@ namespace rcv{
 	
 	Serial cmd(PA_9,PB_7);
 	
+	extern float pw[];
+	
 	void ifReceive();
 	float mc(uint8_t);
 	void procRecieve(uint8_t[]);
@@ -65,15 +67,16 @@ namespace emerg=emergency;
 namespace sensor{
 	//a_imu03a gyro(D11,D12,D13,D10);
 	//a_imu03a gyro(PB_15,PB_14,PB_13,PC_4);
-	aAeGyroSmd gyro(A0,1.2);
+	aAeGyroSmd gyro(A5,1.2);
 }
 
 namespace monitor{
 	void loop(){
 		static mylib::regularC pt(500);
 		if(pt.ist()){
-			//pc.printf("isEmerg:%d gyro:%dmdeg/s\n",(int)emerg::isEmerg,(int)(sensor::gyro.getDdeg()*1000.0));
-			//pc.printf("isEmerg:%d\n",(int)emerg::isEmerg);
+			for(int i=0;i<4;i++){
+				pc.printf("pw[%d]=%d ",i,(int)(rcv::pw[i]*1000));
+			}
 		}
 	}
 }
@@ -199,7 +202,7 @@ namespace rcv{
 	float mc(uint8_t v){
 		return ((float)v-128.0)/128.0;
 	}
-	
+	float pw[4];
 	void procRecieve(uint8_t vals[]){
 		//pc.printf("get ");
 	/*	for(int i=0;i<Q4+1;i++){
@@ -207,7 +210,7 @@ namespace rcv{
 		}*/
 		//pc.printf("\n");
 		float x=mc(vals[X]),y=mc(vals[Y]);
-		float pw[4];
+		
 		const float pi=3.1415926535;
 		const float rads[]={
 			pi/4,
@@ -218,9 +221,9 @@ namespace rcv{
 		
 		for(int i=0;i<4;i++){
 			pw[i]=(x*cos(rads[i])+y*sin(rads[i]));
-			pc.printf("pw[%d]=%d ",i,(int)(pw[i]*1000));
+			//pc.printf("pw[%d]=%d ",i,(int)(pw[i]*1000));
 		}
-		pc.printf("\n");
+		//pc.printf("\n");
 		
 		mt::q1.set(pw[0]);
 		mt::q2.set(pw[1]);

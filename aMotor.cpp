@@ -27,6 +27,10 @@ void aMotorParent::mult(float multArg,float forwardMultArg,float reversalMultArg
 	}
 }
 
+/*
+	direction type
+*/
+
 aMotorDire::aMotorDire (PinName pwmPin,PinName direPin,int pwmPeriod,float multArg,float forwardMultArg,float reversalMultArg):
 	pwm(pwmPin),
 	dire(direPin)
@@ -50,6 +54,10 @@ void aMotorDire::set (float speed){
 }
 
 
+/*
+	pwm type
+*/
+
 aMotorPwm::aMotorPwm (PinName pwmAPin,PinName pwmBPin,int pwmPeriod,float multArg,float forwardMultArg,float reversalMultArg):
 	pwmA(pwmAPin),
 	pwmB(pwmBPin)
@@ -62,20 +70,6 @@ aMotorPwm::aMotorPwm (PinName pwmAPin,PinName pwmBPin,int pwmPeriod,float multAr
 }
 
 void aMotorPwm::set (float speed){
-	/*if(speed<MSPEED::STOP){
-		pwmA=stopPwm+(speed*reversalMult*baseReversalMult*(-1.0));
-		pwmB=stopPwm;
-	}else{
-		
-		pwmが負論理の時forwardMultは負の値になっているので
-		(speed*forwardMult*baseForwardMult)は負の値になる
-		また、この時stopPwmには1.0が入っているので
-		stopPwm+(speed*forwardMult*baseForwardMult)で　1.0+負の値　ということになる
-		つまり、1.0からspeed分が引かれ、pwmBに代入される値は逆転する(speedが0.7のとき0.3 など)
-		
-		pwmA=stopPwm;
-		pwmB=stopPwm+(speed*forwardMult*baseForwardMult);
-	}*/
 	checkSpeed(&speed);
 	
 	if(speed<MSPEED::STOP){

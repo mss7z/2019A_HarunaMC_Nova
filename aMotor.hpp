@@ -1,18 +1,7 @@
 #ifndef __A_MOTOR_HPP__
 #define __A_MOTOR_HPP__
-/*
-#ifndef BASE_FORWARD_MULT
-#define BASE_FORWARD_MULT 0.97
-#endif
 
-#ifndef BASE_REVERSAL_MULT
-#define BASE_REVERSAL_MULT 1.0
-#endif
-*/
-#ifndef DEFO_PWM_PERIOD 
 #define DEFO_PWM_PERIOD 1000 //us
-#endif
-
 #define AMOTOR_MULT_MAX 1.0
 
 #include "mbed.h"
