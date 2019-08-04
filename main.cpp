@@ -35,6 +35,7 @@ namespace rcv{
 	enum{
 		X,
 		Y,
+		K,
 		SN,//solenoid
 		RECEIVE_DS,
 	};
@@ -77,6 +78,7 @@ namespace monitor{
 			for(int i=0;i<4;i++){
 				pc.printf("pw[%d]=%d ",i,(int)(rcv::pw[i]*1000));
 			}
+			pc.printf("\n");
 		}
 	}
 }
@@ -88,6 +90,12 @@ int main(){
 	//return 0;
 	rcv::cmd.attach(rcv::ifReceive,Serial::RxIrq);
 	pc.printf("hello monkey\n");
+	/*
+	mt::m1.set(0.1);
+	mt::m2.set(0.4);
+	mt::m3.set(0.7);
+	mt::m4.set(1.0);
+	return 0;*/
 	
 	//sensor::gyro.startDeg();
 	
@@ -209,26 +217,33 @@ namespace rcv{
 			pc.printf("vals[%d]=%d ",i,(int)(  mc(vals[i])*100.0   ));
 		}*/
 		//pc.printf("\n");
-		float x=mc(vals[X]),y=mc(vals[Y]);
+		float x=mc(vals[X]),y=mc(vals[Y]),k=mc(vals[K]);
 		
 		const float pi=3.1415926535;
 		const float rads[]={
-			pi/4,
 			3*pi/4,
 			-3*pi/4,
 			-pi/4,
+			pi/4,
 		};
 		
 		for(int i=0;i<4;i++){
-			pw[i]=(x*cos(rads[i])+y*sin(rads[i]));
+			pw[i]=(x*cos(rads[i])+y*sin(rads[i]))+k;
 			//pc.printf("pw[%d]=%d ",i,(int)(pw[i]*1000));
 		}
 		//pc.printf("\n");
-		
-		mt::q1.set(pw[0]);
-		mt::q2.set(pw[1]);
-		mt::q3.set(pw[2]);
-		mt::q4.set(pw[3]);
+		if(!emerg::isEmerg){
+			mt::q1.set(pw[0]);
+			mt::q2.set(pw[1]);
+			mt::q3.set(pw[2]);
+			mt::q4.set(pw[3]);	
+		}else{
+			mt::q1.set(0.0);
+			mt::q2.set(0.0);
+			mt::q3.set(0.0);
+			mt::q4.set(0.0);	
+		}
+			
 		return;
 	}
 }
