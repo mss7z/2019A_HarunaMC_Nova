@@ -3,8 +3,8 @@
 aMotorParent::aMotorParent()
 {}
 
-float aMotorParent::baseForwardMult=1.0;
-float aMotorParent::baseReversalMult=1.0;
+float aMotorParent::baseForwardMult=0.95;
+float aMotorParent::baseReversalMult=0.95;
 
 void aMotorParent::baseMult(float multArg,float forwardMultArg,float reversalMultArg){
 	baseForwardMult=multArg*forwardMultArg;
