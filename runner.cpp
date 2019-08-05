@@ -7,7 +7,7 @@ namespace sensor{
 	void loop(){
 	}
 	
-	aAeGyroSmd gyro(A5,1.2);
+	aAeGyroSmd gyro(A5,1.0);
 }
 
 namespace motor{
@@ -40,6 +40,8 @@ namespace mc{
 	void loop(){
 		xyrOut::actXY();
 		xyrOut::actR();
+		
+		xyrOut::out();
 	}
 }
 
@@ -47,9 +49,11 @@ namespace xyrOut{
 	float x;
 	float y;
 	float r;
-	void set(float xa,float ya,float ra){
+	void setXY(float xa,float ya){
 		x=xa;
 		y=ya;
+	}
+	void setR(float ra){
 		r=ra;
 	}
 	void actXY(){
@@ -77,7 +81,7 @@ namespace xyrOut{
 				}
 			}
 			//(1.0-max)　可能な増加量
-			if((1.0-max)>r){
+			if((1.0-max)<r){
 				pm=(1.0-max);
 			}else{
 				pm=r;
@@ -101,10 +105,28 @@ namespace xyrOut{
 			mt::o[i]+=pm;
 		}
 	}
+	void out(){
+		for(int i=0;i<mt::MTDS;i++){
+			mt::q[i]->set(mt::o[i]);
+		}
+	}
+	
 }
 
 namespace revise{
+	void setup(){
+		degPid.set(0.0);
+	}
+	void loop(){
+		deg();
+	}
+	aPid<float> degPid(0.0001,0.0,0.0,deltaT);
 	void deg(){
+		static mylib::regularC pidt((int)(deltaT*1000.0));
+		
+		if(pidt.ist()){
+			xyrOut::setR(degPid.calc(sensor::deg()));
+		}
 	}
 }
 

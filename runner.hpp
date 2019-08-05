@@ -5,6 +5,9 @@
 
 #include "aMotor.hpp"
 #include "aAeGyroSmd.hpp"
+#include "aPid.hpp"
+
+#include "useful.hpp"
 
 namespace sensor{
 	void setup();
@@ -57,12 +60,19 @@ namespace mc{
 }
 
 namespace xyrOut{
-	void set(float x,float y,float r);
+	void setXY(float xa,float ya);
+	void setR(float ra);
 	void actXY();
 	void actR();
+	void out();
 }
 
 namespace revise{
+	void setup();
+	void loop();
+	extern aPid<float> degPid;
+	
+	const float deltaT=0.02;
 	void deg();
 }
 

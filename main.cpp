@@ -19,6 +19,7 @@ namespace monitor{
 			for(int i=0;i<4;i++){
 				pc.printf("pw[%d]=%d ",i,(int)(rcv::pw[i]*1000));
 			}
+			pc.printf("deg:%3d",(int)sensor::deg());
 			pc.printf("\n");
 		}
 	}
@@ -30,6 +31,7 @@ int main(){
 	rcv::setup();
 	emerg::setup();
 	sensor::setup();
+	revise::setup();
 	
 	pc.printf("Welcome to Haruna's Movement Controller Nova\n");
 	/*
@@ -44,6 +46,7 @@ int main(){
 		emerg::loop();
 		sensor::loop();
 		mc::loop();
+		revise::loop();
 		
 		monitor::loop();
 	}

@@ -50,9 +50,12 @@ namespace receive{
 		}*/
 		//pc.printf("\n");
 		float x=mc(vals[X]),y=mc(vals[Y]),k=mc(vals[K]);
+		pw[0]=x;
+		pw[1]=y;
+		pw[2]=k;
+		//pc.printf("x:%5d y:%5d r:%5d\n",(int)(x*1000),(int)(y*1000),(int)(r*1000));
 		
-		
-		xyrOut::set(x,y,k);
+		xyrOut::setXY(x,y);
 		return;
 	}
 }
