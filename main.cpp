@@ -21,7 +21,7 @@ namespace monitor{
 			for(int i=0;i<4;i++){
 				pc.printf("pw[%d]=%d ",i,(int)(rcv::pw[i]*1000));
 			}
-			pc.printf("deg:%3d",(int)sensor::deg());
+			pc.printf("deg:%5dm",(int)(sensor::deg()*1000));
 			pc.printf("\n");
 		}
 	}

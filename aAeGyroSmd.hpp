@@ -8,6 +8,7 @@ class aAeGyroSmd{
 	private:
 		Ticker tc;
 		AnalogIn in;
+		Timer fromPreOffset;//角度補正に使う
 		
 		static const float deltaT=0.01;//second
 		void procRegular();
@@ -20,6 +21,7 @@ class aAeGyroSmd{
 		float mult;
 		
 		float getV(){return in.read()*3.3;};
+		float VtoDdeg(float v){return (mult*(v/(0.67/100.0)));}
 	public:
 		aAeGyroSmd(
 			PinName pin,

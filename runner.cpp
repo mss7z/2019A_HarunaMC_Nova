@@ -12,7 +12,7 @@ namespace sensor{
 	aAeGyroSmd gyro(A5,1.0);
 
 	void reviseGyro(){
-		static mylib::regularC rt(400);
+		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
 		if(rt.ist()){
 			switch (cont){
@@ -22,7 +22,7 @@ namespace sensor{
 				}else{
 					stTime=0;
 				}
-				if(stTime>6){
+				if(stTime>24){
 					cont++;
 					mc::isMustStop=true;
 				}
@@ -30,15 +30,15 @@ namespace sensor{
 				
 				case 1:
 				stpTime++;
-				pc.printf("stp %d\n",stpTime);
-				if(stpTime>3){
+				//pc.printf("stp %d\n",stpTime);
+				if(stpTime>12){
 					stpTime=0;
 					cont++;
 				}
 				break;
 				
 				case 2:
-				pc.printf("rec\n");
+				//pc.printf("rec\n");
 				mc::isMustStop=false;
 				gyro.stopDeg();
 				gyro.updateOffset();
@@ -184,7 +184,7 @@ namespace pid{
 	}
 	
 	bool isStopPid=false;
-	aPid<float> degPid(0.0005,0.00003,0.0001,deltaT);
+	aPid<float> degPid(0.0002,0.00003,0.0001,deltaT);
 	void deg(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
 		
