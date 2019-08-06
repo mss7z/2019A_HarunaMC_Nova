@@ -1,13 +1,57 @@
 #include "runner.hpp"
 
+
 namespace sensor{
 	void setup(){
 		gyro.startDeg();
 	}
 	void loop(){
+		reviseGyro();
 	}
-	
+
 	aAeGyroSmd gyro(A5,1.0);
+
+	void reviseGyro(){
+		static mylib::regularC rt(400);
+		static int cont=0,stTime=0,stpTime=0;
+		if(rt.ist()){
+			switch (cont){
+				case 0:
+				if(mc::isIsiStop){
+					stTime++;
+				}else{
+					stTime=0;
+				}
+				if(stTime>6){
+					cont++;
+					mc::isMustStop=true;
+				}
+				break;
+				
+				case 1:
+				stpTime++;
+				pc.printf("stp %d\n",stpTime);
+				if(stpTime>3){
+					stpTime=0;
+					cont++;
+				}
+				break;
+				
+				case 2:
+				pc.printf("rec\n");
+				mc::isMustStop=false;
+				gyro.stopDeg();
+				gyro.updateOffset();
+				gyro.startDeg();
+				cont=0;
+				break;
+			}
+		}
+		return;
+	}
+
+	
+	
 }
 
 namespace motor{
@@ -38,11 +82,18 @@ namespace mt=motor;
 
 namespace mc{
 	void loop(){
-		xyrOut::actXY();
-		xyrOut::actR();
+		if(isMustStop){
+			xyrOut::actStop();
+		}else{
+			xyrOut::actXY();
+			xyrOut::actR();
+		}
 		
 		xyrOut::out();
 	}
+	
+	bool isIsiStop=false;
+	bool isMustStop=false;
 }
 
 namespace xyrOut{
@@ -105,6 +156,11 @@ namespace xyrOut{
 			mt::o[i]+=pm;
 		}
 	}
+	void actStop(){
+		for(int i=0;i<mt::MTDS;i++){
+			mt::o[i]=0.0;
+		}
+	}
 	void out(){
 		for(int i=0;i<mt::MTDS;i++){
 			mt::q[i]->set(mt::o[i]);
@@ -113,14 +169,22 @@ namespace xyrOut{
 	
 }
 
-namespace revise{
+namespace pid{
+	//xyrOutと同じ構造につまりsetとactおよびx,y,r変数にすべき?
+	
 	void setup(){
 		degPid.set(0.0);
 	}
 	void loop(){
-		deg();
+		if(isStopPid){
+			
+		}else{
+			deg();
+		}
 	}
-	aPid<float> degPid(0.0001,0.0,0.0,deltaT);
+	
+	bool isStopPid=false;
+	aPid<float> degPid(0.0005,0.00003,0.0001,deltaT);
 	void deg(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
 		

@@ -55,6 +55,13 @@ namespace receive{
 		pw[2]=k;
 		//pc.printf("x:%5d y:%5d r:%5d\n",(int)(x*1000),(int)(y*1000),(int)(r*1000));
 		
+		if(vals[X]==128 && vals[Y]==128){
+			mc::isIsiStop=true;
+		}else{
+			mc::isIsiStop=false;
+			mc::isMustStop=false;
+		}
+		
 		xyrOut::setXY(x,y);
 		return;
 	}
@@ -70,7 +77,7 @@ namespace emergency{
 	}
 	
 	void loop(){
-		static mylib::regularC ct(800);//ct=check time
+		static mylib::regularC ct(300);//ct=check time
 		if(ct.ist()){
 			request();
 		}

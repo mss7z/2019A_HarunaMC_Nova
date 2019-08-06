@@ -11,9 +11,18 @@ float aAeGyroSmd::getOffsetV(){
 	float offset=0;
 	for(int i=0;i<N;i++){
 		offset+=getV();
-		wait_ms(2);
+		wait_us(500);
 	}
 	return offset/N;
+}
+
+float aAeGyroSmd::getOffsetVmini(){
+	const int N=20;
+	float offset=0;
+	for(int i=0;i<N;i++){
+		offset+=getV();
+	}
+	return (offset/N);
 }
 
 float aAeGyroSmd::getDdeg(){
@@ -45,4 +54,9 @@ void aAeGyroSmd::procRegular(){
 void aAeGyroSmd::reset(){
 	offsetV=getOffsetV();
 	resetDeg();
+}
+
+void aAeGyroSmd::updateOffset(){
+	pc.printf("offsetV %dmV",(int)(offsetV*1000));
+	offsetV=getOffsetVmini()*0.2+offsetV*0.8;
 }

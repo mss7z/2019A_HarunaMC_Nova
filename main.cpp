@@ -1,6 +1,8 @@
 //NIT,Akita College Robocon Akita
 //2019 A-team Haruna Movement Controller
 //Project Nova by mss7z
+//
+//抵抗は外すべき
 
 #include "mbed.h"
 
@@ -31,7 +33,7 @@ int main(){
 	rcv::setup();
 	emerg::setup();
 	sensor::setup();
-	revise::setup();
+	pid::setup();
 	
 	pc.printf("Welcome to Haruna's Movement Controller Nova\n");
 	/*
@@ -46,7 +48,7 @@ int main(){
 		emerg::loop();
 		sensor::loop();
 		mc::loop();
-		revise::loop();
+		pid::loop();
 		
 		monitor::loop();
 	}

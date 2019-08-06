@@ -15,6 +15,7 @@ namespace sensor{
 	
 	extern aAeGyroSmd gyro;
 	
+	void reviseGyro();
 	inline float deg(){return gyro.getDeg();}
 }
 
@@ -57,6 +58,9 @@ namespace mt=motor;
 
 namespace mc{
 	void loop();
+	
+	extern bool isIsiStop;
+	extern bool isMustStop;
 }
 
 namespace xyrOut{
@@ -64,14 +68,16 @@ namespace xyrOut{
 	void setR(float ra);
 	void actXY();
 	void actR();
+	void actStop();
 	void out();
 }
 
-namespace revise{
+namespace pid{
 	void setup();
 	void loop();
 	extern aPid<float> degPid;
-	
+	//haisi->移動の意思を持たないが、PID層が動作可能な状況において、PID層を停止し、動作を完全に止める
+	extern bool isStopPid;
 	const float deltaT=0.02;
 	void deg();
 }

@@ -2,6 +2,7 @@
 #define __A_AE_GYRO_SMD__
 
 #include "mbed.h"
+#include "useful.hpp"
 
 class aAeGyroSmd{
 	private:
@@ -15,6 +16,7 @@ class aAeGyroSmd{
 		
 		float offsetV;
 		float getOffsetV();
+		float getOffsetVmini();
 		float mult;
 		
 		float getV(){return in.read()*3.3;};
@@ -31,6 +33,8 @@ class aAeGyroSmd{
 		void stopDeg();
 		
 		void reset();
+		
+		void updateOffset();
 };
 
 #endif
