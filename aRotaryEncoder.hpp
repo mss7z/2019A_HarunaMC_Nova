@@ -45,7 +45,7 @@ namespace __aRotaryEncoder_internal__{
 		int accel;
 		void check();
 	public:
-		aRotaryEncoder(PinName AphsPin,PinName BphsPin,bool isForward=true);
+		aRotaryEncoder(PinName AphsPin,PinName BphsPin,PinMode mode=PullNone);
 		//inline関数化
 		void reset()	{val = 0;diff = 0;}
 		int read()  {return val-diff;}

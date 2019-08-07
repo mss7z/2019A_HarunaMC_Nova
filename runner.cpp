@@ -10,6 +10,8 @@ namespace sensor{
 	}
 
 	aAeGyroSmd gyro(A5,1.0);
+	aRotaryEncoder x(A2,A3);
+	
 
 	void reviseGyro(){
 		static mylib::regularC rt(100);

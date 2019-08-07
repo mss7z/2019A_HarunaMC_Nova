@@ -24,18 +24,20 @@ namespace __aRotaryEncoder_internal__{
 		const int preVal=next(val);
 		return val-preVal;
 	}
-
-	aRotaryEncoder::aRotaryEncoder(PinName AphsPin,PinName BphsPin,bool isForward):
+	/*
+	PinMode list
+	PullUp / PullDown / PullNone
+	*/
+	aRotaryEncoder::aRotaryEncoder(PinName AphsPin,PinName BphsPin,PinMode mode):
 		Aphs(AphsPin),//ここで初期化
 		BphsInter(BphsPin)
 	{
-		if(isForward){
-			BphsInter.rise(callback(this, &aRotaryEncoder::BphsRiseProcF));
-			BphsInter.fall(callback(this, &aRotaryEncoder::BphsFallProcF));
-		}else{
-			BphsInter.fall(callback(this, &aRotaryEncoder::BphsRiseProcF));
-			BphsInter.rise(callback(this, &aRotaryEncoder::BphsFallProcF));
-		}
+		Aphs.mode(mode);
+		BphsInter.mode(mode);
+		
+		BphsInter.rise(callback(this, &aRotaryEncoder::BphsRiseProcF));
+		BphsInter.fall(callback(this, &aRotaryEncoder::BphsFallProcF));
+
 		speedTime.attach(callback(this, &aRotaryEncoder::check),CHECK_INTERVAL);
 		val=0;
 		diff=0;
@@ -58,8 +60,8 @@ namespace __aRotaryEncoder_internal__{
 
 	void aRotaryEncoder::check(){
 		//*(1/CHECK_INTERVAL)で毎秒に直す
-		speed=rollVal.delta(val)*(1/CHECK_INTERVAL);
-		accel=rollSpeed.delta(speed)*(1/CHECK_INTERVAL);
+		speed=rollVal.delta(val)*(int)(1/(CHECK_INTERVAL*BUFF_SIZE));
+		accel=rollSpeed.delta(speed)*(int)(1/(CHECK_INTERVAL*BUFF_SIZE));
 		return;
 	}
 

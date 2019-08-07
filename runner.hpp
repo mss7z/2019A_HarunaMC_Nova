@@ -6,6 +6,7 @@
 #include "aMotor.hpp"
 #include "aAeGyroSmd.hpp"
 #include "aPid.hpp"
+#include "aRotaryEncoder.hpp"
 
 #include "useful.hpp"
 
