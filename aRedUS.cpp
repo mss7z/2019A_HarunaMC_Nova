@@ -45,20 +45,23 @@ namespace __aRedUS_internal__{
 	}
 
 	int aRedUS::pulseIn(){
-		int start,time;
+		//早朝(深夜)のプログラミングはいけない、バグの温床となる
+		//センサーが正しく接続されていないときのtimeoutの処理に問題があった
+		int start;
 		t.reset();
 		while(true){
 			if(pin){
 				start=t.read_us();
 				break;
+			}else if(t.read_us()>pulseInTimeOut){
+				return TIMEOUT;
 			}
 		}
 		while(true){
-			time=t.read_us()-start;
 			if(!pin){
-				return time;
-			}else if(time>pulseInTimeOut){
-				return 0;
+				return t.read_us()-start;
+			}else if(t.read_us()>pulseInTimeOut){
+				return TIMEOUT;
 			}
 		}
 	}
@@ -71,15 +74,17 @@ namespace __aRedUS_internal__{
 		wait_us(5);
 		pin=0;
 		pin.input();
-			
+		
 		return pulseIn();
 	}
 	int aRedUS::update(){
 		int val=readus();
 		if(val==TIMEOUT){
+			//pc.printf("timeout\n");
 			isLastTimeout=true;
 			return TIMEOUT;
 		}else{
+			//pc.printf("not timeout\n");
 			isLastTimeout=false;
 			usRaw=val;
 			usAve=ra.ave(usRaw);

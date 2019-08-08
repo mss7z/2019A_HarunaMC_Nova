@@ -3,6 +3,9 @@
 
 
 #include "mbed.h"
+
+#include "useful.hpp"
+
 namespace __aRedUS_internal__{
 	template <int BS=5>
 	class rollAve{

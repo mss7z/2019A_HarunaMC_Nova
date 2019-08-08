@@ -51,6 +51,7 @@ int main(){
 		pid::loop();
 		
 		monitor::loop();
+		//pc.printf("hey\n");
 	}
 	
     return 0;
