@@ -11,6 +11,7 @@ namespace sensor{
 
 	aAeGyroSmd gyro(A5,1.0);
 	aRotaryEncoder x(A2,A3);
+	aRotaryEncoder y(A4,A5);
 	
 
 	void reviseGyro(){

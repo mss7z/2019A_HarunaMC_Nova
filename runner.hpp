@@ -15,6 +15,7 @@ namespace sensor{
 	void loop();
 	
 	extern aAeGyroSmd gyro;
+	extern aRotaryEncoder x;
 	
 	void reviseGyro();
 	inline float deg(){return gyro.getDeg();}
