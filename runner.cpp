@@ -6,15 +6,20 @@ namespace sensor{
 		gyro.startDeg();
 	}
 	void loop(){
-		reviseGyro();
+		reviseGyroOwn();
+		reviseGyroExt();
 	}
 
-	aAeGyroSmd gyro(A5,1.0);
-	aRotaryEncoder x(A2,A3);
-	aRotaryEncoder y(A4,A5);
+	aAeGyroSmd gyro(PC_4,1.0);
+	aRotaryEncoder x(A2,A3,PullDown);
+	aRotaryEncoder y(A4,A5,PullDown);
 	
+	namespace blue{
+		aRedUS f(PH_1);
+		aRedUS b(PH_0);
+	}
 
-	void reviseGyro(){
+	void reviseGyroOwn(){
 		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
 		if(rt.ist()){
@@ -52,9 +57,22 @@ namespace sensor{
 		}
 		return;
 	}
-
-	
-	
+	void reviseGyroExt(){
+		static mylib::regularC rt(500);
+		static mylib::trueFalse witch(true);
+		if(rt.ist()){
+			if(witch.get()){
+				blue::f.update();
+			}else{
+				blue::b.update();
+			}
+			if(!(blue::f.isTimeout()) && !(blue::b.isTimeout())){
+				gyro.setDeg((180*atan((blue::f.readMM()-blue::b.readMM())/500))/M_PI);
+				pc.printf("f%4dmm  b%4dmm\n",blue::f.readMM(),blue::b.readMM());
+			}
+			//pc.printf("hey\n");
+		}
+	}
 }
 
 namespace motor{

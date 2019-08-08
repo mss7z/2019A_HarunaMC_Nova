@@ -39,6 +39,14 @@ namespace mylib{
 		void set(unsigned long val){interval=val;}
 		unsigned long read(){return interval;}
 	};
+	
+	class trueFalse{
+		private:
+		bool is;
+		public:
+		trueFalse(bool start=true):is(!start){}
+		bool get(){is=!is;return is;}
+	};
 }
 
 #endif

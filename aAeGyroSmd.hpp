@@ -8,7 +8,7 @@ class aAeGyroSmd{
 	private:
 		Ticker tc;
 		AnalogIn in;
-		Timer fromPreOffset;//角度補正に使う
+		//Timer fromPreOffset;//角度補正に使う
 		
 		static const float deltaT=0.01;//second
 		void procRegular();
@@ -33,6 +33,7 @@ class aAeGyroSmd{
 		void startDeg();
 		void resetDeg();
 		void stopDeg();
+		void setDeg(float v){deg=v;}
 		
 		void reset();
 		

@@ -55,8 +55,8 @@ void aAeGyroSmd::procRegular(){
 void aAeGyroSmd::reset(){
 	offsetV=getOffsetV();
 	resetDeg();
-	fromPreOffset.reset();
-	fromPreOffset.start();
+	//fromPreOffset.reset();
+	//fromPreOffset.start();
 }
 
 void aAeGyroSmd::updateOffset(){
@@ -64,8 +64,8 @@ void aAeGyroSmd::updateOffset(){
 	float newOV;//OV=offsetV
 	newOV=getOffsetVmini()*0.1+offsetV*0.9;
 	
-	deg-=((newOV-offsetV)*fromPreOffset.read())/2.0;
-	pc.printf("-deg:%6d\n",(int)((((newOV-offsetV)*fromPreOffset.read())/2.0)*1000));
+	//deg-=((newOV-offsetV)*fromPreOffset.read())/2.0;
+	//pc.printf("-deg:%6d\n",(int)((((newOV-offsetV)*fromPreOffset.read())/2.0)*1000));
 	
 	offsetV=newOV;
 }

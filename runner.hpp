@@ -7,8 +7,10 @@
 #include "aAeGyroSmd.hpp"
 #include "aPid.hpp"
 #include "aRotaryEncoder.hpp"
+#include "aRedUS.hpp"
 
 #include "useful.hpp"
+#include <math.h>
 
 namespace sensor{
 	void setup();
@@ -16,8 +18,15 @@ namespace sensor{
 	
 	extern aAeGyroSmd gyro;
 	extern aRotaryEncoder x;
+	extern aRotaryEncoder y;
 	
-	void reviseGyro();
+	namespace blue{
+		extern aRedUS f;
+		extern aRedUS b;
+	}
+	
+	void reviseGyroOwn();
+	void reviseGyroExt();
 	inline float deg(){return gyro.getDeg();}
 }
 
