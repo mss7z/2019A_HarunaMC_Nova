@@ -13,10 +13,10 @@ namespace sensor{
 	aAeGyroSmd gyro(PC_4,1.0);
 	aRotaryEncoder x(A2,A3,PullDown);
 	aRotaryEncoder y(A4,A5,PullDown);
-	
+	 
 	namespace blue{
-		aRedUS f(PH_1);
-		aRedUS b(PH_0);
+		aRedUS f(PH_1,5*1000);
+		aRedUS b(PA_13,5*1000);
 	}
 
 	void reviseGyroOwn(){
@@ -58,17 +58,23 @@ namespace sensor{
 		return;
 	}
 	void reviseGyroExt(){
-		static mylib::regularC rt(500);
+		static mylib::regularC rvs(40);//rvs=revise
 		static mylib::trueFalse witch(true);
-		if(rt.ist()){
+		if(rvs.ist()){
 			if(witch.get()){
-				blue::f.update();
+				if(blue::f.update()==aRedUS::TIMEOUT){
+					blue::f.reset();
+				}
+				//pc.printf("f\n");
 			}else{
-				blue::b.update();
+				if(blue::b.update()==aRedUS::TIMEOUT){
+					blue::b.reset();
+				}
+				//pc.printf("b\n");
 			}
 			if(!(blue::f.isTimeout()) && !(blue::b.isTimeout())){
-				gyro.setDeg((180*atan((blue::f.readMM()-blue::b.readMM())/500))/M_PI);
-				pc.printf("f%4dmm  b%4dmm\n",blue::f.readMM(),blue::b.readMM());
+				gyro.setDeg( ((180.0*atan((blue::f.readMM()-blue::b.readMM())/400.0))/M_PI)*0.5 + gyro.getDeg()*0.5 );
+				pc.printf("f%4dmm  b%4dmm %4dmDeg\n",blue::f.readMM(),blue::b.readMM(),(int)(gyro.getDeg()*1000.0));
 			}
 			//pc.printf("hey\n");
 		}
@@ -205,7 +211,8 @@ namespace pid{
 	}
 	
 	bool isStopPid=false;
-	aPid<float> degPid(0.0002,0.00003,0.0001,deltaT);
+	aPid<float> degPid(0.00008,0.00003,0.00005,deltaT);
+	//aPid<float> degPid(0.0002,0.00000,0.0001,deltaT);
 	void deg(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
 		

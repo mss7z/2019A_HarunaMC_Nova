@@ -26,7 +26,7 @@ namespace __aRedUS_internal__{
 		private:
 		DigitalInOut pin;
 		Timer t;
-		rollAve<5> ra;//お猿さん
+		rollAve<8> ra;//お猿さん
 		
 		int pulseIn();
 		int readus();
