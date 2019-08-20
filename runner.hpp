@@ -12,6 +12,40 @@
 #include "useful.hpp"
 #include <math.h>
 
+/*
+	runner の構造
+	
+	namespace mc
+	|	|
+	|	PID☆彡
+	|	namespace pid{
+	|		private
+	|			deg()
+	|		public
+	|			setup()
+	|			loop()
+	|	}
+	|	|	|
+	|	|	namespace sensor
+	|	|	|
+	各モータのすぐ上
+	xy軸方向の出力を受けて各モータの出力を決定
+	namespace out{
+		private
+			actXY()
+			actR()
+			actStop()
+			out()
+		public
+			出力を設定
+			setXY(x,y)
+			setR(r)
+			setStop(is)
+	}
+	|
+	namespace motor(mt)
+*/
+
 namespace sensor{
 	void setup();
 	void loop();
@@ -46,9 +80,9 @@ namespace motor{
 				pwmAPin,
 				pwmBPin,
 				1000,//pwm period
-				multArg=1.0,
-				forwardMultArg=1.0,
-				reversalMultArg=1.0
+				multArg,
+				forwardMultArg,
+				reversalMultArg
 			){};
 			void set(float val){
 				if(isStop){
@@ -67,30 +101,31 @@ namespace motor{
 }
 namespace mt=motor;
 
+//movement control runnerの長
 namespace mc{
+	void setup();
 	void loop();
-	
+	//上級が停止の意思があるかを示す（上級は止めているが下級のほうでPIDなどでマシンが動いてもよい）
 	extern bool isIsiStop;
-	extern bool isMustStop;
 }
 
-namespace xyrOut{
+namespace out{
+	void setup();
+	void loop();
 	void setXY(float xa,float ya);
 	void setR(float ra);
-	void actXY();
+	void setStop(bool);
+	/*void actXY();
 	void actR();
 	void actStop();
-	void out();
+	void out();*/
 }
 
 namespace pid{
 	void setup();
 	void loop();
-	extern aPid<float> degPid;
-	//haisi->移動の意思を持たないが、PID層が動作可能な状況において、PID層を停止し、動作を完全に止める
-	extern bool isStopPid;
-	const float deltaT=0.02;
-	void deg();
+	//XY軸の制御を有効にするか
+	void turnXY(bool);
 }
 
 

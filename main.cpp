@@ -33,7 +33,8 @@ int main(){
 	rcv::setup();
 	emerg::setup();
 	sensor::setup();
-	pid::setup();
+	mc::setup();
+	
 	
 	pc.printf("Welcome to Haruna's Movement Controller Nova\n");
 	/*
@@ -47,11 +48,12 @@ int main(){
 		rcv::loop();
 		emerg::loop();
 		sensor::loop();
-		mc::loop();
-		pid::loop();
 		
 		monitor::loop();
 		//pc.printf("hey\n");
+		
+		//mcLoopは最後に呼ばれなければならない
+		mc::loop();
 	}
 	
     return 0;

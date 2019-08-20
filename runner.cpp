@@ -19,6 +19,7 @@ namespace sensor{
 		aRedUS b(PA_13,5*1000);
 	}
 
+	//ジャイロのゼロ点調整を行う
 	void reviseGyroOwn(){
 		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
@@ -32,7 +33,7 @@ namespace sensor{
 				}
 				if(stTime>24){
 					cont++;
-					mc::isMustStop=true;
+					out::setStop(true);
 				}
 				break;
 				
@@ -47,7 +48,7 @@ namespace sensor{
 				
 				case 2:
 				//pc.printf("rec\n");
-				mc::isMustStop=false;
+				out::setStop(false);
 				gyro.stopDeg();
 				gyro.updateOffset();
 				gyro.startDeg();
@@ -57,6 +58,7 @@ namespace sensor{
 		}
 		return;
 	}
+	//超音波距離計による角度算出とジャイロの補正
 	void reviseGyroExt(){
 		static mylib::regularC rvs(40);//rvs=revise
 		static mylib::trueFalse witch(true);
@@ -107,32 +109,57 @@ namespace motor{
 }
 namespace mt=motor;
 
+//move control
 namespace mc{
+	void setup(){
+		pid::setup();
+		out::setup();
+	}
 	void loop(){
-		if(isMustStop){
-			xyrOut::actStop();
-		}else{
-			xyrOut::actXY();
-			xyrOut::actR();
-		}
-		
-		xyrOut::out();
+		pid::loop();
+		//outLoopは最後に呼ばれなければならない
+		out::loop();
 	}
 	
 	bool isIsiStop=false;
-	bool isMustStop=false;
+	
 }
 
-namespace xyrOut{
+namespace out{
+	//強制停止かどうか(操作元は上級の場合と下級の場合がある)
+	bool isMustStop=false;
 	float x;
 	float y;
 	float r;
+	
+	void actXY();
+	void actR();
+	void actStop();
+	void out();
+	
+	void setup(){
+		x=y=r=0.0;
+		isMustStop=false;
+	}
+	void loop(){
+		if(isMustStop){
+			actStop();
+		}else{
+			actXY();
+			actR();
+		}
+		out();
+	}
+	
 	void setXY(float xa,float ya){
 		x=xa;
 		y=ya;
 	}
 	void setR(float ra){
 		r=ra;
+	}
+	void setStop(bool is){
+		isMustStop=is;
 	}
 	void actXY(){
 		const float pi=3.1415926535;
@@ -197,28 +224,34 @@ namespace xyrOut{
 }
 
 namespace pid{
-	//xyrOutと同じ構造につまりsetとactおよびx,y,r変数にすべき?
+	//XY軸の制御を有効にするか
+	bool isRunXY=false;
+	const float deltaT=0.02;
+	aPid<float> degPid(0.00008,0.00003,0.00005,deltaT);
+	//aPid<float> degPid(0.0002,0.00000,0.0001,deltaT);
+	
+	void pactR();
+	
+	//outと同じ構造につまりsetとactおよびx,y,r変数にすべき?
 	
 	void setup(){
 		degPid.set(0.0);
 	}
 	void loop(){
-		if(isStopPid){
-			
-		}else{
-			deg();
+		static mylib::regularC pidt((int)(deltaT*1000.0));
+		if(pidt.ist()){
+			if(isRunXY){
+				//XY軸の制御pactXYをここに書く
+			}
+			pactR();
 		}
 	}
+	void turnXY(bool is){
+		isRunXY=is;
+	}
 	
-	bool isStopPid=false;
-	aPid<float> degPid(0.00008,0.00003,0.00005,deltaT);
-	//aPid<float> degPid(0.0002,0.00000,0.0001,deltaT);
-	void deg(){
-		static mylib::regularC pidt((int)(deltaT*1000.0));
-		
-		if(pidt.ist()){
-			xyrOut::setR(degPid.calc(sensor::deg()));
-		}
+	void pactR(){
+		out::setR(degPid.calc(sensor::deg()));
 	}
 }
 

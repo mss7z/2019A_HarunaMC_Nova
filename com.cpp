@@ -59,10 +59,10 @@ namespace receive{
 			mc::isIsiStop=true;
 		}else{
 			mc::isIsiStop=false;
-			mc::isMustStop=false;
+			out::setStop(false);
 		}
 		
-		xyrOut::setXY(x,y);
+		out::setXY(x,y);
 		return;
 	}
 }
