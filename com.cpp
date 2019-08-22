@@ -132,7 +132,7 @@ namespace emergency{
 	void procCmdReponse(uint8_t data[],uint16_t size){
 		if(data[12]=='I' && data[13]=='S'){//at cmd
 			if(data[14]==0x00){//at cmd statusが0x00(SUCCESS)なら
-				isEmerg=!((data[20]>>1)&0x1);//DIO1がHIGHか？
+				isEmerg=((data[20]>>1)&0x1);//DIO1がHIGHか？
 				mt::isStop=isEmerg;
 			}
 		}

@@ -24,15 +24,20 @@ namespace sensor{
 		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
 		if(rt.ist()){
+			if(!mc::isIsiStop){
+				stTime=0;
+				stpTime=0;
+				cont=0;
+				return;
+			}
 			switch (cont){
 				case 0:
 				if(mc::isIsiStop){
 					stTime++;
-				}else{
-					stTime=0;
 				}
-				if(stTime>24){
+				if(stTime>60){
 					cont++;
+					stTime=0;
 					out::setStop(true);
 				}
 				break;
