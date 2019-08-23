@@ -71,6 +71,7 @@ namespace receive{
 namespace emergency{
 	bool isEmerg=false;
 	aXBee xbee(PA_0,PA_1,38400);
+	void swRamp(bool);
 	
 	void setup(){
 		xbee.attachFrame(receive);
@@ -80,6 +81,7 @@ namespace emergency{
 		static mylib::regularC ct(300);//ct=check time
 		if(ct.ist()){
 			request();
+			swRamp(!isEmerg);
 		}
 	}
 	
@@ -107,6 +109,25 @@ namespace emergency{
 			0x04,//value
 		};
 		if(led[15]==0x04){
+			//pc.printf("0x04\n");
+			led[15]=0x05;//output low
+		}else{
+			led[15]=0x04;//output high
+		}
+		xbee.sendFrame(led,sizeof(led)/sizeof(led[0]));
+	}
+	void swRamp(bool val){
+		//ledは一応確認用に点滅させる
+		static uint8_t led[]={
+			0x17,//remote at cmd request
+			0x01,//frame id
+			0x00,0x13,0xA2,0x00,0x40,0xCA,0x9D,0x64,
+			0xFF,0xFE,
+			0x02,//Remote cmd. options
+			'D','3',//AT cmd
+			0x04,//value
+		};
+		if(val){
 			//pc.printf("0x04\n");
 			led[15]=0x05;//output low
 		}else{

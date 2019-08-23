@@ -65,8 +65,10 @@ namespace sensor{
 	}
 	//超音波距離計による角度算出とジャイロの補正
 	void reviseGyroExt(){
-		static mylib::regularC rvs(40);//rvs=revise
+		static const int interval=40;
+		static mylib::regularC rvs(interval);//rvs=revise
 		static mylib::trueFalse witch(true);
+		static mylib::delta<float> dg((float)interval/1000.0);
 		if(rvs.ist()){
 			if(witch.get()){
 				if(blue::f.update()==aRedUS::TIMEOUT){
@@ -80,8 +82,15 @@ namespace sensor{
 				//pc.printf("b\n");
 			}
 			if(!(blue::f.isTimeout()) && !(blue::b.isTimeout())){
-				gyro.setDeg( ((180.0*atan((blue::f.readMM()-blue::b.readMM())/400.0))/M_PI)*0.5 + gyro.getDeg()*0.5 );
-				pc.printf("f%4dmm  b%4dmm %4dmDeg\n",blue::f.readMM(),blue::b.readMM(),(int)(gyro.getDeg()*1000.0));
+				//float newDeg=((180.0*atan((blue::f.readMM()-blue::b.readMM())/400.0))/M_PI)*0.01 + gyro.getDeg()*0.99;
+				float newDeg=(180.0*atan((blue::f.readMM()-blue::b.readMM())/400.0))/M_PI;
+				if(abs(dg.f(newDeg))<0.1){
+					gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+					pc.printf("f%4dmm  b%4dmm %4dmDeg\n",blue::f.readMM(),blue::b.readMM(),(int)(gyro.getDeg()*1000.0));
+				}
+				//pc.printf("f%4dmm  b%4dmm %4dmDeg\n",blue::f.readMM(),blue::b.readMM(),(int)(gyro.getDeg()*1000.0));
+			}else{
+				dg.reset();
 			}
 			//pc.printf("hey\n");
 		}

@@ -47,6 +47,23 @@ namespace mylib{
 		trueFalse(bool start=true):is(!start){}
 		bool get(){is=!is;return is;}
 	};
+	
+	template <typename T>
+	class delta{
+	private:
+		T preVal;
+		T deltaT;
+	public:
+		delta(T dt=(T)1):preVal((T)0),deltaT(dt){}
+		T f(T val){
+			const T ans=(val-preVal)/deltaT;
+			preVal=val;
+			return ans;
+		}
+		void reset(){
+			preVal=0;
+		}
+	};
 }
 
 #endif
