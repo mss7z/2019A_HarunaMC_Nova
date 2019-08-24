@@ -120,18 +120,18 @@ namespace mc{
 namespace out{
 	void setup();
 	void loop();
-	void setXY(float xa,float ya);
+	void setX(float xa);
+	void setY(float ya);
 	void setR(float ra);
 	void setStop(bool);
-	/*void actXY();
-	void actR();
-	void actStop();
-	void out();*/
 }
 
 namespace pid{
 	void setup();
 	void loop();
+	void psetX(float xa);
+	void psetY(float ya);
+	void psetR(float ra);
 	//XY軸の制御を有効にするか
 	void turnXY(bool);
 }

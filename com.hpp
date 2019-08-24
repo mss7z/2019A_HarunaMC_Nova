@@ -16,16 +16,13 @@ namespace receive{
 	enum{
 		X,
 		Y,
-		K,
+		R,
 		RDS,//receive data size
 	};
-	
-	extern float pw[];
 	
 	extern Serial cmd;
 	
 	void ifReceive();
-	float mc(uint8_t);
 	void procRecieve(uint8_t[]);
 }
 namespace rcv=receive;

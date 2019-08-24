@@ -262,9 +262,11 @@ namespace out{
 		out();
 	}
 	
-	void setXY(float xa,float ya){
+	void setX(float xa){
 		x=xa;
-		y=ya;
+	}
+	void setY(float ya){
+		x=ya;
 	}
 	void setR(float ra){
 		r=ra;
@@ -338,33 +340,60 @@ namespace pid{
 	//XY軸の制御を有効にするか
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
-	aPid<float> degPid(0.00008,0.00003,0.00005,deltaT);
-	//aPid<float> degPid(0.0002,0.00000,0.0001,deltaT);
+	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
+	aPid<float> pidX(0.00008,0.00000,0.00000,deltaT);
+	aPid<float> pidY(0.00008,0.00000,0.00000,deltaT);
 	
 	void pactR();
+	void pactX();
+	void pactY();
 	
 	//outと同じ構造につまりsetとactおよびx,y,r変数にすべき?
 	
 	void setup(){
-		degPid.set(0.0);
+		psetR(sensor::deg());
+		psetX(sensor::x());
+		psetY(sensor::y());
 	}
 	void loop(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
 		if(pidt.ist()){
 			if(isRunX){
-				//XY軸の制御pactXYをここに書く
+				pactX();
 			}
 			if(isRunY){
-				//XY軸の制御pactXYをここに書く
+				pactY();
 			}
 			pactR();
 		}
 	}
-	void turnX(bool is){isRunX=is;}
-	void turnY(bool is){isRunY=is;}
+	void turnX(bool is){
+		if(is)pidX.reset();
+		isRunX=is;
+	}
+	void turnY(bool is){
+		if(is)pidY.reset();
+		isRunY=is;
+	}
+	
+	void psetX(float xa){
+		pidX.set(xa);
+	}
+	void psetY(float ya){
+		pidY.set(ya);
+	}
+	void psetR(float ra){
+		pidR.set(ra);
+	}
 	
 	void pactR(){
-		out::setR(degPid.calc(sensor::deg()));
+		out::setR(pidR.calc(sensor::deg()));
+	}
+	void pactX(){
+		out::setX(pidX.calc(sensor::x()));
+	}
+	void pactY(){
+		out::setY(pidX.calc(sensor::y()));
 	}
 }
 

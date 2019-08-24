@@ -18,9 +18,7 @@ namespace monitor{
 	void loop(){
 		static mylib::regularC pt(500);
 		if(pt.ist()){
-			for(int i=0;i<4;i++){
-				pc.printf("pw[%d]=%d ",i,(int)(rcv::pw[i]*1000));
-			}
+			pc.printf("x: %10smm y:%10smm",flt(sensor::x()),flt(sensor::y()));
 			pc.printf("deg:%5dm",(int)(sensor::deg()*1000));
 			pc.printf("\n");
 		}
@@ -36,7 +34,7 @@ int main(){
 	mc::setup();
 	
 	
-	pc.printf("Welcome to Haruna's Movement Controller Nova\n");
+	pc.printf("\nWelcome to Haruna's Movement Controller Nova\n");
 	/*
 	mt::m1.set(0.1);
 	mt::m2.set(0.4);

@@ -7,6 +7,16 @@
 extern Serial pc;
 extern DigitalOut led;
 
+#define ARRAYLEN(X) (sizeof((X))/sizeof((X)[0]))
+
+namespace __flt_internal__{
+	//myFlt ver.0.1 by mss7z 201908250133
+	//mbedにおいて浮動小数点型をprintfで使用する
+	//使い方例: pc.printf("%s\n",flt(3.141592653,5));
+	char *flt(float val,const int decimal=3);
+}
+using __flt_internal__::flt;
+
 namespace arduino{
 
 	template<typename T>

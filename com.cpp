@@ -9,7 +9,6 @@ namespace receive{
 	}
 	
 	//変数
-	float pw[4];
 	Serial cmd(PA_9,PB_7);
 	
 	//関数
@@ -44,16 +43,18 @@ namespace receive{
 	}
 
 	void procRecieve(uint8_t vals[]){
-		//pc.printf("get ");
-	/*	for(int i=0;i<Q4+1;i++){
-			pc.printf("vals[%d]=%d ",i,(int)(  mc(vals[i])*100.0   ));
-		}*/
-		//pc.printf("\n");
-		float x=mc(vals[X]),y=mc(vals[Y]),k=mc(vals[K]);
-		pw[0]=x;
-		pw[1]=y;
-		pw[2]=k;
+		//float x=mc(vals[X]),y=mc(vals[Y]),k=mc(vals[K]);
+		
 		//pc.printf("x:%5d y:%5d r:%5d\n",(int)(x*1000),(int)(y*1000),(int)(r*1000));
+		static float prex=0,prey=0,prer=0;
+		
+		static float interval=0.07;
+		prex=prex+vals[X]*interval;
+		prey=prey+vals[Y]*interval;
+		prer=prer+vals[R]*interval;
+		pid::psetX(prex);
+		pid::psetY(prey);
+		pid::psetR(prer);
 		
 		if(vals[X]==128 && vals[Y]==128){
 			mc::setIsiStop(true);
@@ -62,7 +63,7 @@ namespace receive{
 			out::setStop(false);
 		}
 		
-		out::setXY(x,y);
+		//out::setXY(x,y);
 		return;
 	}
 }
