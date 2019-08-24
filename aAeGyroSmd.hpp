@@ -22,6 +22,7 @@ class aAeGyroSmd{
 		
 		float getV(){return in.read()*3.3;};
 		float VtoDdeg(float v){return (mult*(v/(0.67/100.0)));}
+		//0.67mV per Deg だが オペアンプで10倍にしてあるので 0.67/100
 	public:
 		aAeGyroSmd(
 			PinName pin,

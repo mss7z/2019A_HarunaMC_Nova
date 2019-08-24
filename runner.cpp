@@ -162,6 +162,7 @@ namespace sensor{
 		static mylib::delta<float> dg((float)readRedUSinterval/1000.0);
 		if(!(fp->isTimeout()) && !(bp->isTimeout())){
 			//float newDeg=((180.0*atan((fp->readMM()-bp->readMM())/400.0))/M_PI)*0.01 + gyro.getDeg()*0.99;
+			//400はセンサー間の距離400mm
 			float newDeg=(180.0*atan((fp->readMM()-bp->readMM())/400.0))/M_PI;
 			if(abs(dg.f(newDeg))<0.1){
 				gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
@@ -174,6 +175,7 @@ namespace sensor{
 	}
 	void reviseYExt(){
 		if(!(fp->isTimeout()) && !(bp->isTimeout())){
+			//マシンの外から中央までの距離280mm???????????????????????????????????????????????????????????????????
 			yv=((fp->readMM()+bp->readMM())/2.0)+280.0;
 		}
 	}
@@ -275,7 +277,7 @@ namespace out{
 		isMustStop=is;
 	}
 	void actXY(){
-		const float pi=3.1415926535;
+		const float pi=M_PI;
 		const float rads[]={
 			3*pi/4,
 			-3*pi/4,
