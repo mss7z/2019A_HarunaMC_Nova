@@ -56,9 +56,9 @@ namespace receive{
 		//pc.printf("x:%5d y:%5d r:%5d\n",(int)(x*1000),(int)(y*1000),(int)(r*1000));
 		
 		if(vals[X]==128 && vals[Y]==128){
-			mc::isIsiStop=true;
+			mc::setIsiStop(true);
 		}else{
-			mc::isIsiStop=false;
+			mc::setIsiStop(false);
 			out::setStop(false);
 		}
 		

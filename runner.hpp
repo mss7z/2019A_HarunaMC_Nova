@@ -51,17 +51,21 @@ namespace sensor{
 	void loop();
 	
 	extern aAeGyroSmd gyro;
-	extern aRotaryEncoder x;
-	extern aRotaryEncoder y;
+	extern aRotaryEncoder xenc;
+	extern aRotaryEncoder yenc;
 	
 	namespace blue{
 		extern aRedUS f;
 		extern aRedUS b;
 	}
+	extern aRedUS *fp,*bp;
 	
-	void reviseGyroOwn();
-	void reviseGyroExt();
 	inline float deg(){return gyro.getDeg();}
+	inline float rad(){return (M_PI*(gyro.getDeg()))/180.0;}
+	float x();
+	float y();
+	void setX(float);
+	void setY(float);
 }
 
 namespace motor{
@@ -105,8 +109,12 @@ namespace mt=motor;
 namespace mc{
 	void setup();
 	void loop();
-	//上級が停止の意思があるかを示す（上級は止めているが下級のほうでPIDなどでマシンが動いてもよい）
-	extern bool isIsiStop;
+	
+	void setIsiStop(bool);
+	bool isIsiStop();
+	
+	void setBlueField(bool);
+	bool isBlueField();
 }
 
 namespace out{

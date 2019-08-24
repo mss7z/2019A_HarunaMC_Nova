@@ -63,6 +63,9 @@ namespace mylib{
 		void reset(){
 			preVal=0;
 		}
+		void set(T val){
+			preVal=val;
+		}
 	};
 }
 

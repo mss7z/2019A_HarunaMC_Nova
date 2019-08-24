@@ -2,21 +2,63 @@
 
 
 namespace sensor{
+	float xv=0.0,yv=0.0;
+	Ticker calcXYtime;
+	mylib::delta<float> dx,dy;
+	static const int readRedUSinterval=40;
+	
+	void reviseGyroOwn();
+	void reviseByRedUS();
+	void reviseGyroExt();
+	void reviseYExt();
+	void calcXY();
+	
 	void setup(){
 		gyro.startDeg();
+		calcXYtime.attach(calcXY,0.01);
+		dx.reset();
+		dy.reset();
 	}
 	void loop(){
 		reviseGyroOwn();
-		reviseGyroExt();
+		reviseByRedUS();
+		
+		if(mc::isBlueField()){
+			fp=&blue::f;
+			bp=&blue::b;
+		}
 	}
 
 	aAeGyroSmd gyro(PC_4,1.0);
-	aRotaryEncoder x(A2,A3,PullDown);
-	aRotaryEncoder y(A4,A5,PullDown);
+	aRotaryEncoder xenc(A2,A3,PullDown);
+	aRotaryEncoder yenc(A4,A5,PullDown);
 	 
 	namespace blue{
 		aRedUS f(PH_1,5*1000);
 		aRedUS b(PA_13,5*1000);
+	}
+	aRedUS *fp=NULL,*bp=NULL;
+	
+	void calcXY(){
+		//エンコーダ1カウント当たり何ミリメートルか？
+		static const float mmPerREcont=1.0;//------------------------------------------------------sitei
+		//書いてて気が付いたけど、これって線形変換の回転移動？
+		xv+=(dx.f(xenc.readRaw())*cos(rad())-dy.f(yenc.readRaw())*sin(rad()))*mmPerREcont;
+		yv+=(dx.f(xenc.readRaw())*sin(rad())+dy.f(yenc.readRaw())*cos(rad()))*mmPerREcont;
+	}
+	
+	float x(){
+		return xv;
+	}
+	float y(){
+		return yv;
+	}
+	
+	void setX(float newVal){
+		xv=newVal;
+	}
+	void setY(float newVal){
+		yv=newVal;
 	}
 
 	//ジャイロのゼロ点調整を行う
@@ -24,7 +66,7 @@ namespace sensor{
 		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
 		if(rt.ist()){
-			if(!mc::isIsiStop){
+			if(!mc::isIsiStop()){
 				stTime=0;
 				stpTime=0;
 				cont=0;
@@ -32,7 +74,7 @@ namespace sensor{
 			}
 			switch (cont){
 				case 0:
-				if(mc::isIsiStop){
+				if(mc::isIsiStop()){
 					stTime++;
 				}
 				if(stTime>60){
@@ -63,12 +105,12 @@ namespace sensor{
 		}
 		return;
 	}
+	
 	//超音波距離計による角度算出とジャイロの補正
-	void reviseGyroExt(){
-		static const int interval=40;
+	/*void reviseGyroExt(){
 		static mylib::regularC rvs(interval);//rvs=revise
 		static mylib::trueFalse witch(true);
-		static mylib::delta<float> dg((float)interval/1000.0);
+		static mylib::delta<float> dg((float)readRedUSinterval/1000.0);
 		if(rvs.ist()){
 			if(witch.get()){
 				if(blue::f.update()==aRedUS::TIMEOUT){
@@ -93,6 +135,46 @@ namespace sensor{
 				dg.reset();
 			}
 			//pc.printf("hey\n");
+		}
+	}*/
+	
+	void reviseByRedUS(){
+		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
+		static mylib::trueFalse witch(true);
+		if(rvs.ist()){
+			if(witch.get()){
+				if(fp->update()==aRedUS::TIMEOUT){
+					fp->reset();
+				}
+				//pc.printf("f\n");
+			}else{
+				if(bp->update()==aRedUS::TIMEOUT){
+					bp->reset();
+				}
+				//pc.printf("b\n");
+			}
+			reviseGyroExt();
+			reviseYExt();
+			//pc.printf("hey\n");
+		}
+	}
+	void reviseGyroExt(){
+		static mylib::delta<float> dg((float)readRedUSinterval/1000.0);
+		if(!(fp->isTimeout()) && !(bp->isTimeout())){
+			//float newDeg=((180.0*atan((fp->readMM()-bp->readMM())/400.0))/M_PI)*0.01 + gyro.getDeg()*0.99;
+			float newDeg=(180.0*atan((fp->readMM()-bp->readMM())/400.0))/M_PI;
+			if(abs(dg.f(newDeg))<0.1){
+				gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+				pc.printf("f%4dmm  b%4dmm %4dmDeg\n",fp->readMM(),bp->readMM(),(int)(gyro.getDeg()*1000.0));
+			}
+			//pc.printf("f%4dmm  b%4dmm %4dmDeg\n",fp->readMM(),bp->readMM(),(int)(gyro.getDeg()*1000.0));
+		}else{
+			dg.reset();
+		}
+	}
+	void reviseYExt(){
+		if(!(fp->isTimeout()) && !(bp->isTimeout())){
+			yv=((fp->readMM()+bp->readMM())/2.0)+280.0;
 		}
 	}
 }
@@ -125,6 +207,7 @@ namespace mt=motor;
 
 //move control
 namespace mc{
+	
 	void setup(){
 		pid::setup();
 		out::setup();
@@ -135,8 +218,22 @@ namespace mc{
 		out::loop();
 	}
 	
-	bool isIsiStop=false;
+	//上級が停止の意思があるかを示す（上級は止めているが下級のほうでPIDなどでマシンが動いてもよい）
+	bool isIsiStopVal;
+	void setIsiStop(bool val){
+		isIsiStopVal=val;
+	}
+	bool isIsiStop(){
+		return isIsiStopVal;
+	}
 	
+	bool isBlueFieldVal=true;
+	void setBlueField(bool val){
+		isBlueFieldVal=val;
+	}
+	bool isBlueField(){
+		return isBlueFieldVal;
+	}
 }
 
 namespace out{
@@ -239,7 +336,7 @@ namespace out{
 
 namespace pid{
 	//XY軸の制御を有効にするか
-	bool isRunXY=false;
+	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> degPid(0.00008,0.00003,0.00005,deltaT);
 	//aPid<float> degPid(0.0002,0.00000,0.0001,deltaT);
@@ -254,15 +351,17 @@ namespace pid{
 	void loop(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
 		if(pidt.ist()){
-			if(isRunXY){
+			if(isRunX){
+				//XY軸の制御pactXYをここに書く
+			}
+			if(isRunY){
 				//XY軸の制御pactXYをここに書く
 			}
 			pactR();
 		}
 	}
-	void turnXY(bool is){
-		isRunXY=is;
-	}
+	void turnX(bool is){isRunX=is;}
+	void turnY(bool is){isRunY=is;}
 	
 	void pactR(){
 		out::setR(degPid.calc(sensor::deg()));
