@@ -61,7 +61,7 @@ namespace sensor{
 	extern aRedUS *fp,*bp;
 	
 	inline float deg(){return gyro.getDeg();}
-	inline float rad(){return (M_PI*(gyro.getDeg()))/180.0;}
+	inline float rad(){return (M_PI*(deg()))/180.0;}
 	float x();
 	float y();
 	void setX(float);
@@ -129,11 +129,13 @@ namespace out{
 namespace pid{
 	void setup();
 	void loop();
+	extern aPid<float> pidX,pidY,pidR;
 	void psetX(float xa);
 	void psetY(float ya);
 	void psetR(float ra);
 	//XY軸の制御を有効にするか
-	void turnXY(bool);
+	void turnX(bool);
+	void turnY(bool);
 }
 
 

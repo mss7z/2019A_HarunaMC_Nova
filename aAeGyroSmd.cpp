@@ -7,7 +7,7 @@ aAeGyroSmd::aAeGyroSmd(PinName pin,float multArg):
 }
 
 float aAeGyroSmd::getOffsetV(){
-	const int N=2000;
+	const int N=5000;
 	float offset=0;
 	for(int i=0;i<N;i++){
 		offset+=getV();
@@ -49,7 +49,7 @@ void aAeGyroSmd::stopDeg(){
 }
 
 void aAeGyroSmd::procRegular(){
-	deg+=getDdeg()*deltaT;
+	deg-=getDdeg()*deltaT;
 }
 
 void aAeGyroSmd::reset(){

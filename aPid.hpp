@@ -34,6 +34,7 @@ namespace __aPid_internal__{
 		aPid(float kPArg,float kIArg,float kDArg,float dtArg);
 		T calc(T val);
 		void set(T val){target=val;}
+		T read(){return target;}
 		void reset();
 	};
 	

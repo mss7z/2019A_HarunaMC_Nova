@@ -10,7 +10,7 @@ namespace sensor{
 	void reviseGyroOwn();
 	void reviseByRedUS();
 	void reviseGyroExt();
-	void reviseYExt();
+	void reviseXExt();
 	void calcXY();
 	
 	void setup(){
@@ -20,7 +20,7 @@ namespace sensor{
 		dy.reset();
 	}
 	void loop(){
-		reviseGyroOwn();
+		//reviseGyroOwn();
 		reviseByRedUS();
 		
 		if(mc::isBlueField()){
@@ -30,9 +30,10 @@ namespace sensor{
 	}
 
 	aAeGyroSmd gyro(PC_4,1.0);
-	aRotaryEncoder xenc(A2,A3,PullDown);
-	aRotaryEncoder yenc(A4,A5,PullDown);
-	 
+	
+	aRotaryEncoder yenc(A5,A4,PullDown);
+	aRotaryEncoder xenc(A3,A2,PullDown);
+	
 	namespace blue{
 		aRedUS f(PH_1,5*1000);
 		aRedUS b(PA_13,5*1000);
@@ -41,10 +42,11 @@ namespace sensor{
 	
 	void calcXY(){
 		//エンコーダ1カウント当たり何ミリメートルか？
-		static const float mmPerREcont=1.0;//------------------------------------------------------sitei
+		static const float mmPerREcont=0.6258641615;//------------------------------------------------------sitei
 		//書いてて気が付いたけど、これって線形変換の回転移動？
-		xv+=(dx.f(xenc.readRaw())*cos(rad())-dy.f(yenc.readRaw())*sin(rad()))*mmPerREcont;
-		yv+=(dx.f(xenc.readRaw())*sin(rad())+dy.f(yenc.readRaw())*cos(rad()))*mmPerREcont;
+		const float dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
+		xv+=(dxv*cos(rad())-dyv*sin(rad()))*mmPerREcont;
+		yv+=(dxv*sin(rad())+dyv*cos(rad()))*mmPerREcont;
 	}
 	
 	float x(){
@@ -154,7 +156,7 @@ namespace sensor{
 				//pc.printf("b\n");
 			}
 			reviseGyroExt();
-			reviseYExt();
+			//reviseXExt();
 			//pc.printf("hey\n");
 		}
 	}
@@ -173,10 +175,10 @@ namespace sensor{
 			dg.reset();
 		}
 	}
-	void reviseYExt(){
+	void reviseXExt(){
 		if(!(fp->isTimeout()) && !(bp->isTimeout())){
 			//マシンの外から中央までの距離280mm???????????????????????????????????????????????????????????????????
-			yv=((fp->readMM()+bp->readMM())/2.0)+280.0;
+			xv=((fp->readMM()+bp->readMM())/2.0)+280.0;
 		}
 	}
 }
@@ -268,7 +270,7 @@ namespace out{
 		x=xa;
 	}
 	void setY(float ya){
-		x=ya;
+		y=ya;
 	}
 	void setR(float ra){
 		r=ra;
@@ -343,8 +345,8 @@ namespace pid{
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
-	aPid<float> pidX(0.00008,0.00000,0.00000,deltaT);
-	aPid<float> pidY(0.00008,0.00000,0.00000,deltaT);
+	aPid<float> pidX(0.00002,0.00000,0.00000,deltaT);
+	aPid<float> pidY(0.00002,0.00000,0.00000,deltaT);
 	
 	void pactR();
 	void pactX();
@@ -356,6 +358,8 @@ namespace pid{
 		psetR(sensor::deg());
 		psetX(sensor::x());
 		psetY(sensor::y());
+		turnX(true);
+		turnY(true);
 	}
 	void loop(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
@@ -395,7 +399,7 @@ namespace pid{
 		out::setX(pidX.calc(sensor::x()));
 	}
 	void pactY(){
-		out::setY(pidX.calc(sensor::y()));
+		out::setY(pidY.calc(sensor::y()));
 	}
 }
 

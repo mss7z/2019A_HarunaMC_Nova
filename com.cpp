@@ -48,13 +48,14 @@ namespace receive{
 		//pc.printf("x:%5d y:%5d r:%5d\n",(int)(x*1000),(int)(y*1000),(int)(r*1000));
 		static float prex=0,prey=0,prer=0;
 		
-		static float interval=0.07;
-		prex=prex+vals[X]*interval;
-		prey=prey+vals[Y]*interval;
-		prer=prer+vals[R]*interval;
+		static const float interval=0.07;
+		static const float xyMult=10;
+		prex=prex+(vals[X]-128)*interval*xyMult;
+		prey=prey+(vals[Y]-128)*interval*xyMult;
+		prer=prer+(vals[R]-128)*interval;
 		pid::psetX(prex);
 		pid::psetY(prey);
-		pid::psetR(prer);
+		//pid::psetR(prer);
 		
 		if(vals[X]==128 && vals[Y]==128){
 			mc::setIsiStop(true);
