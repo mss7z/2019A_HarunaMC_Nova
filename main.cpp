@@ -18,8 +18,10 @@ namespace monitor{
 	void loop(){
 		static mylib::regularC pt(500);
 		if(pt.ist()){
-			pc.printf("x: %10smm y:%10smm",flt(sensor::x()),flt(sensor::y()));
-			pc.printf("deg:%5dm",(int)(sensor::deg()*1000));
+			pc.printf("xenc:%6d yenc:%6d ",sensor::xenc.readRaw(),sensor::yenc.readRaw());
+			pc.printf("target x:%10smm y:%10smm r:%10s ",flt(pid::pidX.read()),flt(pid::pidY.read()),flt(pid::pidR.read()));
+			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
+			pc.printf("r:%10sdeg",flt(sensor::deg()));
 			pc.printf("\n");
 		}
 	}
@@ -40,6 +42,9 @@ int main(){
 	mt::m2.set(0.4);
 	mt::m3.set(0.7);
 	mt::m4.set(1.0);
+	return 0;*/
+	/*out::setY(1.0);
+	mc::loop();
 	return 0;*/
 	
 	while (true){
