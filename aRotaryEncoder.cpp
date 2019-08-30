@@ -28,16 +28,19 @@ namespace __aRotaryEncoder_internal__{
 	PinMode list
 	PullUp / PullDown / PullNone
 	*/
-	aRotaryEncoder::aRotaryEncoder(PinName AphsPin,PinName BphsPin,PinMode mode):
+	aRotaryEncoder::aRotaryEncoder(PinName AphsPin,PinName BphsPin,PinMode mode,bool isForward):
 		Aphs(AphsPin),//ここで初期化
 		BphsInter(BphsPin)
 	{
 		Aphs.mode(mode);
 		BphsInter.mode(mode);
-		
-		BphsInter.rise(callback(this, &aRotaryEncoder::BphsRiseProcF));
-		BphsInter.fall(callback(this, &aRotaryEncoder::BphsFallProcF));
-
+		if(isForward){
+			BphsInter.rise(callback(this, &aRotaryEncoder::BphsRiseProcF));
+			BphsInter.fall(callback(this, &aRotaryEncoder::BphsFallProcF));
+		}else{
+			BphsInter.fall(callback(this, &aRotaryEncoder::BphsRiseProcF));
+			BphsInter.rise(callback(this, &aRotaryEncoder::BphsFallProcF));
+		}
 		speedTime.attach(callback(this, &aRotaryEncoder::check),CHECK_INTERVAL);
 		val=0;
 		diff=0;

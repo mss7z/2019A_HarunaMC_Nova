@@ -54,9 +54,8 @@ namespace sensor{
 	extern aRotaryEncoder xenc;
 	extern aRotaryEncoder yenc;
 	
-	namespace blue{
-		extern aRedUS f;
-		extern aRedUS b;
+	namespace redus{
+		extern aRedUS bluef,blueb,redf,redb;
 	}
 	extern aRedUS *fp,*bp;
 	

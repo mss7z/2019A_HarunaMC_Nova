@@ -24,19 +24,26 @@ namespace sensor{
 		reviseByRedUS();
 		
 		if(mc::isBlueField()){
-			fp=&blue::f;
-			bp=&blue::b;
+			fp=&redus::bluef;
+			bp=&redus::blueb;
+		}else{
+			fp=&redus::redf;
+			bp=&redus::redb;
 		}
+			
 	}
 
 	aAeGyroSmd gyro(PC_4,1.0);
 	
-	aRotaryEncoder yenc(A5,A4,PullDown);
-	aRotaryEncoder xenc(A3,A2,PullDown);
+	aRotaryEncoder yenc(A5,A4,PullDown,false);
+	aRotaryEncoder xenc(A2,A3,PullDown);
 	
-	namespace blue{
-		aRedUS f(PH_1,5*1000);
-		aRedUS b(PA_13,5*1000);
+	namespace redus{
+		const int TIMEOUT=5*1000;//us?
+		aRedUS bluef(PC_3,TIMEOUT);
+		aRedUS blueb(PC_2,TIMEOUT);
+		aRedUS redf(PH_1,TIMEOUT);
+		aRedUS redb(PA_15,TIMEOUT);
 	}
 	aRedUS *fp=NULL,*bp=NULL;
 	
@@ -199,10 +206,10 @@ namespace motor{
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
 	
-	aMt &q1=m1;
-	aMt &q2=m2;
-	aMt &q3=m4;
-	aMt &q4=m3;
+	aMt &q1=m4;
+	aMt &q2=m3;
+	aMt &q3=m1;
+	aMt &q4=m2;
 	
 	aMt *q[MTDS]={&q1,&q2,&q3,&q4};
 	float o[MTDS];
@@ -288,7 +295,7 @@ namespace out{
 		};
 		
 		for(int i=0;i<mt::MTDS;i++){
-			mt::o[i]=(x*cos(rads[i])+y*sin(rads[i]));
+			mt::o[i]=(x*cos(rads[i]+sensor::rad())+y*sin(rads[i]+sensor::rad()));
 			//pc.printf("pw[%d]=%d ",i,(int)(pw[i]*1000));
 		}
 	}

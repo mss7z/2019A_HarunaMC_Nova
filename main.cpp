@@ -37,15 +37,16 @@ int main(){
 	
 	
 	pc.printf("\nWelcome to Haruna's Movement Controller Nova\n");
-	
-	/*mt::q1.set(0.1);
+	/*
+	mt::q1.set(0.1);
 	mt::q2.set(0.3);
 	mt::q3.set(0.6);
 	mt::q4.set(1.0);
 	return 0;*/
 	/*mt::q4.set(0.3);
 	return 0;*/
-	/*out::setY(1.0);
+	/*out::setX(0.5);
+	out::setY(0.2);
 	mc::loop();
 	return 0;*/
 	
