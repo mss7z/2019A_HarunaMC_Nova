@@ -33,7 +33,7 @@ namespace sensor{
 			
 	}
 
-	aAeGyroSmd gyro(PC_4,1.0);
+	aAeGyroSmd gyro(PC_5,1.0);
 	
 	aRotaryEncoder yenc(A5,A4,PullDown,false);
 	aRotaryEncoder xenc(A2,A3,PullDown);
@@ -44,6 +44,9 @@ namespace sensor{
 		aRedUS blueb(PC_2,TIMEOUT);
 		aRedUS redf(PH_1,TIMEOUT);
 		aRedUS redb(PA_15,TIMEOUT);
+		aRedUS front(PB_13,TIMEOUT);
+		aRedUS back(PB_14,TIMEOUT);
+		//aRedUSはプルダウン
 	}
 	aRedUS *fp=NULL,*bp=NULL;
 	
@@ -191,7 +194,13 @@ namespace sensor{
 }
 
 namespace motor{
+	
 	bool isStop=false;
+	DigitalOut mton(PC_4);
+	
+	void setup(){
+		on(true);
+	}
 	
 	enum{
 		Q1,
@@ -206,13 +215,21 @@ namespace motor{
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
 	
-	aMt &q1=m4;
-	aMt &q2=m3;
-	aMt &q3=m1;
-	aMt &q4=m2;
+	aMt &q1=m3;
+	aMt &q2=m1;
+	aMt &q3=m2;
+	aMt &q4=m4;
 	
 	aMt *q[MTDS]={&q1,&q2,&q3,&q4};
 	float o[MTDS];
+	
+	void on(bool is){
+		mton=is;
+	}
+	void emergStopIs(bool is){
+		isStop=is;
+		on(!is);
+	}
 }
 namespace mt=motor;
 
@@ -222,6 +239,7 @@ namespace mc{
 	void setup(){
 		pid::setup();
 		out::setup();
+		mt::setup();
 	}
 	void loop(){
 		pid::loop();

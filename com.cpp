@@ -49,7 +49,7 @@ namespace receive{
 		static float prex=0,prey=0,prer=0;
 		
 		static const float interval=0.07;
-		static const float xyMult=10;
+		static const float xyMult=20;
 		prex=prex+(vals[X]-128)*interval*xyMult;
 		prey=prey+(vals[Y]-128)*interval*xyMult;
 		prer=prer+(vals[R]-128)*interval;
@@ -156,7 +156,8 @@ namespace emergency{
 		if(data[12]=='I' && data[13]=='S'){//at cmd
 			if(data[14]==0x00){//at cmd statusが0x00(SUCCESS)なら
 				isEmerg=((data[20]>>1)&0x1);//DIO1がHIGHか？
-				mt::isStop=isEmerg;
+				//mt::isStop=isEmerg;
+				mt::emergStopIs(isEmerg);
 			}
 		}
 	}

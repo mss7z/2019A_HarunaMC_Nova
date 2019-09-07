@@ -49,7 +49,7 @@ void aAeGyroSmd::stopDeg(){
 }
 
 void aAeGyroSmd::procRegular(){
-	deg-=getDdeg()*deltaT;
+	deg+=getDdeg()*deltaT;
 }
 
 void aAeGyroSmd::reset(){

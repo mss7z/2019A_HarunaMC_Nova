@@ -68,6 +68,8 @@ namespace sensor{
 }
 
 namespace motor{
+	void setup();
+	
 	extern bool isStop;
 	class aMt:aMotorPwm{
 		//汚いコンストラクタ
@@ -101,6 +103,9 @@ namespace motor{
 	
 	extern aMt *q[];
 	extern float o[];
+	
+	void on(bool);
+	void emergStopIs(bool);
 }
 namespace mt=motor;
 
