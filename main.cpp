@@ -12,6 +12,24 @@
 
 #include "com.hpp"
 #include "useful.hpp"
+#include "mautoCore.hpp"
+
+/*
+	構造☆彡
+	
+	下級
+	aSeries
+	|
+	runner
+	|	|
+	|	|
+	|	auto
+	|	|
+	com
+	|
+	main
+	上級
+*/
 
 
 namespace monitor{
@@ -30,10 +48,11 @@ namespace monitor{
 
 
 int main(){
-	rcv::setup();
-	emerg::setup();
 	sensor::setup();
 	mc::setup();
+	auco::setup();
+	rcv::setup();
+	emerg::setup();
 	
 	
 	pc.printf("\nWelcome to Haruna's Movement Controller Nova\n");
@@ -57,12 +76,12 @@ int main(){
 	return 0;*/
 	
 	while (true){
+		monitor::loop();
+		
+		sensor::loop();
+		auco::loop();
 		rcv::loop();
 		emerg::loop();
-		sensor::loop();
-		
-		monitor::loop();
-		//pc.printf("hey\n");
 		
 		//mcLoopは最後に呼ばれなければならない
 		mc::loop();

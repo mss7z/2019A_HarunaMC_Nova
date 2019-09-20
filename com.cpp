@@ -2,6 +2,12 @@
 
 //親マイコンからの移動指令を処理
 namespace receive{
+	Serial cmd(PA_9,PB_7);
+	
+	void ifReceive();
+	void procRecieve(uint8_t[]);
+	void sendAns();
+	
 	void setup(){
 		rcv::cmd.attach(rcv::ifReceive,Serial::RxIrq);
 	}
@@ -9,7 +15,6 @@ namespace receive{
 	}
 	
 	//変数
-	Serial cmd(PA_9,PB_7);
 	
 	//関数
 	void ifReceive(){
@@ -41,7 +46,7 @@ namespace receive{
 	float mc(uint8_t v){
 		return ((float)v-128.0)/128.0;
 	}
-
+	/*
 	void procRecieve(uint8_t vals[]){
 		//float x=mc(vals[X]),y=mc(vals[Y]),k=mc(vals[K]);
 		
@@ -65,6 +70,25 @@ namespace receive{
 		}
 		
 		//out::setXY(x,y);
+		return;
+	}
+	void sendAns(){
+		return;
+	}
+	*/
+	void procRecieve(uint8_t vals[]){
+		auco::parentCmd rcvCmd=(auco::parentCmd)vals[CMD];
+		static auco::parentCmd lastCmd=auco::STOP;
+		if(lastCmd != vals[CMD]){
+			auco::turnCmd(rcvCmd);
+			lastCmd=rcvCmd;
+		}
+		sendAns();
+		return;
+	}
+	void sendAns(){
+		cmd.putc(0x3E);
+		cmd.putc((int)auco::readCmdsts());
 		return;
 	}
 }

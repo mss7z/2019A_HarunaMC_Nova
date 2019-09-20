@@ -7,23 +7,25 @@
 
 #include "useful.hpp"
 #include "runner.hpp"
+#include "mautoCore.hpp"
 
 //親マイコンからの移動指令を処理
 namespace receive{
 	void setup();
 	void loop();
 	
+	/*
 	enum{
 		X,
 		Y,
 		R,
 		RDS,//receive data size
 	};
-	
-	extern Serial cmd;
-	
-	void ifReceive();
-	void procRecieve(uint8_t[]);
+	*/
+	enum{
+		CMD,
+		RDS,//receive data size
+	};
 }
 namespace rcv=receive;
 
