@@ -4,16 +4,17 @@
 #include "runner.hpp"
 #include "mbed.h"
 #include "coord.hpp"
+#include "useful.hpp"
 
 namespace auco{
 	void setup();
 	void loop();
 	
 	enum parentCmd{
-		OTSK,
+		STOP=0,
+		OTSK=1,
 		SHOT,
 		GOBACK,
-		STOP,
 	};
 	enum statusCmd{
 		MOVING,

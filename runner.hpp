@@ -137,6 +137,9 @@ namespace pid{
 	void psetX(float xa);
 	void psetY(float ya);
 	void psetR(float ra);
+	
+	float preadX();
+	float preadY();
 	//XY軸の制御を有効にするか
 	void turnX(bool);
 	void turnY(bool);

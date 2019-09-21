@@ -77,6 +77,7 @@ namespace receive{
 	}
 	*/
 	void procRecieve(uint8_t vals[]){
+		pc.printf("get val is %d\n",vals[CMD]);
 		auco::parentCmd rcvCmd=(auco::parentCmd)vals[CMD];
 		static auco::parentCmd lastCmd=auco::STOP;
 		if(lastCmd != vals[CMD]){

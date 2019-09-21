@@ -14,6 +14,8 @@ namespace sensor{
 	void calcXY();
 	
 	void setup(){
+		xv=575;
+		yv=1748;
 		gyro.startDeg();
 		calcXYtime.attach(calcXY,0.01);
 		dx.reset();
@@ -385,6 +387,8 @@ namespace pid{
 	void psetR(float ra){
 		pidR.set(ra);
 	}
+	float preadX(){return pidX.read();}
+	float preadY(){return pidY.read();}
 	
 	void pactR(){
 		out::setR(pidR.calc(sensor::deg()));

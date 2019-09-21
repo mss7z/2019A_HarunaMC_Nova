@@ -10,10 +10,13 @@ namespace player{
 		t.start();
 	}
 	bool isPlayEnd(){
-		if(nowf(t.read_ms())==coord::ENDCOORD){
+		pointc val;
+		if(( val=nowf(t.read_ms()) ) ==coord::ENDCOORD){
 			t.stop();
 			return true;
 		}else{
+			pid::psetX(val.x);
+			pid::psetY(val.y);
 			return false;
 		}
 	}
@@ -36,11 +39,13 @@ namespace auco{
 	void turnCmd(parentCmd cmd){//setupてきな
 		cmdnow=cmd;
 		cmdsts=MOVING;
+		pc.printf("turn to %d",(int)cmd);
 		switch((int)cmd){
 			case STOP:
 			mc::setIsiStop(true);
 			pid::turnX(false);
 			pid::turnY(false);
+			cmdsts=MOVED;
 			break;
 			
 			case OTSK:
