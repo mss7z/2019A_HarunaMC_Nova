@@ -23,6 +23,8 @@ namespace player{
 };
 
 namespace auco{
+	bool isEmerg=false;
+	
 	parentCmd cmdnow;
 	statusCmd cmdsts;
 	void procCmdnow();
@@ -37,6 +39,10 @@ namespace auco{
 	
 	//cmdを切り替えるときに呼ぶ　初期化などをする
 	void turnCmd(parentCmd cmd){//setupてきな
+		if(isEmerg){
+			pc.printf("emg!\n");
+			return;
+		}
 		cmdnow=cmd;
 		cmdsts=MOVING;
 		pc.printf("turn to %d",(int)cmd);
@@ -54,6 +60,10 @@ namespace auco{
 			pid::turnY(true);
 			player::set(coord::otsk);
 			break;
+			
+			default:
+			pc.printf("unk cmd! %3d(0x%2X)\n",(int)cmd,(int)cmd);
+			break;
 		}
 	}
 	void procCmdnow(){//loop的な
@@ -67,9 +77,23 @@ namespace auco{
 				cmdsts=MOVED;
 			}
 			break;
+			
+			default:
+			pc.printf("FATAL ERR in mautoCore procCmdnow default called!!\n");
+			break;
 		}
 	}
 	statusCmd readCmdsts(){
 		return cmdsts;
+	}
+	void emergIs(bool is){
+		if(is){
+			turnCmd(STOP);
+			isEmerg=is;
+			cmdsts=EMERG;
+		}else{
+			isEmerg=is;
+			//cmdsts=MOVED;
+		}
 	}
 };

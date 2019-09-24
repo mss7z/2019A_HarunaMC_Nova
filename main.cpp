@@ -36,17 +36,17 @@
 namespace monitor{
 	void loop(){
 		static mylib::regularC pt(500);
-		/*if(pt.ist()){
-			pc.printf("xenc:%6d yenc:%6d ",sensor::xenc.readRaw(),sensor::yenc.readRaw());
+		if(pt.ist()){
+			//pc.printf("xenc:%6d yenc:%6d ",sensor::xenc.readRaw(),sensor::yenc.readRaw());
 			pc.printf("target x:%10smm y:%10smm r:%10s ",flt(pid::pidX.read()),flt(pid::pidY.read()),flt(pid::pidR.read()));
-			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
-			pc.printf("r:%10sdeg",flt(sensor::deg()));
+			//pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
+			//pc.printf("r:%10sdeg",flt(sensor::deg()));
 			pc.printf("\n");
-		}*/
+		}/*
 		if(pt.ist()){
 			pc.printf("target x:%10smm y:%10smm r:%10s ",flt(pid::pidX.read()),flt(pid::pidY.read()),flt(pid::pidR.read()));
 			pc.printf("\n");
-		}
+		}*/
 	}
 }
 

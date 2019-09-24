@@ -54,7 +54,8 @@ namespace sensor{
 	
 	void calcXY(){
 		//エンコーダ1カウント当たり何ミリメートルか？
-		static const float mmPerREcont=0.6258641615;//------------------------------------------------------sitei
+		//static const float mmPerREcont=0.6258641615;//------------------------------------------------------sitei
+		static const float mmPerREcont=0.3098641192;//1回転1024パルス、円周101Pi、(101Pi)/1024
 		//書いてて気が付いたけど、これって線形変換の回転移動？
 		const float dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
 		xv+=(dxv*cos(rad())-dyv*sin(rad()))*mmPerREcont;

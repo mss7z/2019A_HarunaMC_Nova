@@ -10,6 +10,7 @@ namespace receive{
 	
 	void setup(){
 		rcv::cmd.attach(rcv::ifReceive,Serial::RxIrq);
+		cmd.baud(115200);
 	}
 	void loop(){
 	}
@@ -38,6 +39,10 @@ namespace receive{
 				cont=0;
 				procRecieve(vals);
 			}
+			break;
+			
+			default:
+			pc.printf("FATAL ERR in com ifReceive default call!!\n");
 			break;
 		}
 		return;
@@ -77,7 +82,8 @@ namespace receive{
 	}
 	*/
 	void procRecieve(uint8_t vals[]){
-		pc.printf("get val is %d\n",vals[CMD]);
+		//pc.printf("r%d",vals[CMD]);
+		led=!led;
 		auco::parentCmd rcvCmd=(auco::parentCmd)vals[CMD];
 		static auco::parentCmd lastCmd=auco::STOP;
 		if(lastCmd != vals[CMD]){
@@ -90,6 +96,7 @@ namespace receive{
 	void sendAns(){
 		cmd.putc(0x3E);
 		cmd.putc((int)auco::readCmdsts());
+		//pc.printf(" s%d\n",(int)auco::readCmdsts());
 		return;
 	}
 }
@@ -183,6 +190,7 @@ namespace emergency{
 				isEmerg=((data[20]>>1)&0x1);//DIO1がHIGHか？
 				//mt::isStop=isEmerg;
 				mt::emergStopIs(isEmerg);
+				auco::emergIs(isEmerg);
 			}
 		}
 	}

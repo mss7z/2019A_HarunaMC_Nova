@@ -17,12 +17,14 @@ namespace auco{
 		GOBACK,
 	};
 	enum statusCmd{
+		EMERG=1,
 		MOVING,
 		MOVED,
 	};
 	
 	void turnCmd(parentCmd cmd);
 	statusCmd readCmdsts();
+	void emergIs(bool);
 };
 
 #endif

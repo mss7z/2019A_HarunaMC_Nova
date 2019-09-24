@@ -309,6 +309,6 @@ namespace coord{
 			{2003,39},
 			ENDCOORD
 		};
-		return cd[t/10];
+		return cd[t/50];
 	}
 };
