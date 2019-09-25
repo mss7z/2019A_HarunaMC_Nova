@@ -1,7 +1,6 @@
 #include "useful.hpp"
 
-
-Serial pc(USBTX,USBRX);
+Serial pc(USBTX,USBRX,NULL,115200);
 DigitalOut led(LED1);
 
 namespace __flt_internal__{

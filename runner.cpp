@@ -14,8 +14,6 @@ namespace sensor{
 	void calcXY();
 	
 	void setup(){
-		xv=575;
-		yv=1748;
 		gyro.startDeg();
 		calcXYtime.attach(calcXY,0.01);
 		dx.reset();
@@ -342,8 +340,8 @@ namespace pid{
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
-	aPid<float> pidX(0.00002,0.00000,0.00000,deltaT);
-	aPid<float> pidY(0.00002,0.00000,0.00000,deltaT);
+	aPid<float> pidX(0.00002,0.00002,0.00000,deltaT);
+	aPid<float> pidY(0.00002,0.00002,0.00000,deltaT);
 	
 	void pactR();
 	void pactX();

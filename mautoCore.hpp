@@ -6,6 +6,10 @@
 #include "coord.hpp"
 #include "useful.hpp"
 
+namespace player{
+	void loop();
+};
+
 namespace auco{
 	void setup();
 	void loop();

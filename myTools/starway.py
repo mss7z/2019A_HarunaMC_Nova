@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-from math import sqrt
+import math
 import pickle
 
 mmPerPixcel=10
@@ -83,6 +83,8 @@ class lineClass:
 			return self.len()
 		else:
 			return self.len()+self.nextLine.lenC()
+	def fl(self,l):
+		return self.f(l/self.calcedLen)
 	def flC(self,l):
 		#self.len()
 		if l<=self.calcedLen:
@@ -102,12 +104,9 @@ class startl(lineClass):
 		return self.f()
 	
 class bazier(lineClass):
-	def __init__(self,frma=None):
+	def __init__(self,frma):
 		super().__init__()
-		if frma == None:
-			self.frm=point(belong=self)
-		else:
-			self.frm=frma
+		self.frm=frma
 		self.p1=point(belong=self)
 		self.p2=point(belong=self)
 		self.end=point(belong=self)
@@ -118,15 +117,16 @@ class bazier(lineClass):
 		x=(1-t)**3*self.frm.x + 3*(1-t)**2*t*self.p1.x + 3*(1-t)*t**2*self.p2.x + t**3*self.end.x
 		y=(1-t)**3*self.frm.y + 3*(1-t)**2*t*self.p1.y + 3*(1-t)*t**2*self.p2.y + t**3*self.end.y
 		return (x,y)
-	def fl(self,l):
-		return self.f(l/self.calcedLen)
+	
 	def len(self):
 		prex,prey=self.f(0)
 		ans=0
 		for i in frange(0,1,0.01):
 			nowx,nowy=self.f(i)
-			ans+=(nowx-prex)**2+(nowy-prey)**2
-		self.calcedLen=sqrt(ans)
+			ans+=math.sqrt((nowx-prex)**2+(nowy-prey)**2)
+			prex=nowx
+			prey=nowy
+		self.calcedLen=ans
 		return self.calcedLen
 	def draw(self,detail=0.1):
 		ys=[]
@@ -139,6 +139,29 @@ class bazier(lineClass):
 	def delete(self):
 		self.p1.delete()
 		self.p2.delete()
+		self.end.delete()
+		self.line.remove()
+
+class straight(lineClass):
+	def __init__(self,frma):
+		super().__init__()
+		self.frm=frma
+		self.end=point(belong=self)
+		self.len()
+		self.line,=ax.plot(0,0)
+		print("maked bazier")
+	def f(self,t):
+		x=(1-t)*self.frm.x+t*self.end.x
+		y=(1-t)*self.frm.y+t*self.end.y
+		return (x,y)
+	def len(self):
+		self.calcedLen=math.sqrt((self.frm.x-self.end.x)**2 + (self.frm.y-self.end.x)**2)
+		return self.calcedLen
+	def draw(self,detail=0):
+		ys=(self.frm.y,self.end.y)
+		xs=(self.frm.x,self.end.x)
+		self.line.set_data(xs,ys)
+	def delete(self):
 		self.end.delete()
 		self.line.remove()
 	
@@ -178,11 +201,32 @@ def addLine(line,new):
 	line.nextLine.preLine=line
 	line.nextLine.draw()
 
+def genSlope(x):
+	#return (math.sin((x-0.5)*math.pi)+1.0)/2.0
+	return (math.sin((x)*(math.pi/2.0)))
+
+def genSpeed(now,total):
+	tagSpd=10
+	tagSpdH=500
+	if total<(tagSpdH*2):
+		mult=total/(tagSpdH*2)
+		tagSpd*=mult
+		tagSpdH*=mult
+	byEnd=total-now
+	if now<tagSpdH:
+		return genSlope(now/tagSpdH)*tagSpd
+	elif byEnd<tagSpdH:
+		return genSlope(byEnd/tagSpdH)*tagSpd
+	else:
+		return tagSpd
+
 def genCoord():
 	total=line.lenC()
-	for i in frange(0,total,10):
+	i=0
+	while i<=total:
 		x,y=line.flC(i)
-		print("{{{},{}}},".format(int(x*mmPerPixcel),int(y*mmPerPixcel)))
+		print("{{{},{}}},".format(int(x*mmPerPixcel),int(y*mmPerPixcel)),end="")
+		i+=genSpeed(i,total)+0.1
 	pass
 
 def key(event):
@@ -201,6 +245,10 @@ def key(event):
 		if slctP!=None:
 			if slctP.belong != None:
 				addLine(slctP.belong,bazier)
+	elif event.key=='z':
+		if slctP!=None:
+			if slctP.belong != None:
+				addLine(slctP.belong,straight)
 	elif event.key=='d':
 		if slctP!=None:
 			if slctP.belong != None:
@@ -212,6 +260,12 @@ def key(event):
 	elif event.key=='i':
 		genCoord()
 		print("len {}".format(line.lenC()))
+	elif event.key=='t':
+		for i in range(0,1500,10):
+			spd=int(genSpeed(i,1500)*10)
+			for j in range(spd):
+				print(" ",end="")
+			print("0")
 key.nowDragSetting=False
 
 #スタート

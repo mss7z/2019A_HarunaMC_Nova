@@ -4,19 +4,51 @@
 namespace player{
 	coordFunc nowf=NULL;
 	Timer t;
+	bool isTimerRun;
+	float yMult=1.0;
+	
+	void set(coordFunc);
+	bool isPlayEnd();
+	
+	void loop(){
+		if(mc::isBlueField()){
+			yMult=1.0;
+		}else{
+			yMult=-1.0;
+		}
+	}
+	
 	void set(coordFunc f){
 		nowf=f;
 		t.reset();
 		t.start();
+		isTimerRun=true;
+	}
+	#define SQ(X) ((X)*(X))
+	float distSq(pointc val){
+		float x=sensor::x(),y=sensor::y();
+		return SQ(val.x-x)+SQ(val.y-y);
 	}
 	bool isPlayEnd(){
 		pointc val;
 		if(( val=nowf(t.read_ms()) ) ==coord::ENDCOORD){
 			t.stop();
+			isTimerRun=false;
 			return true;
 		}else{
+			if(distSq(val)>SQ(500)){
+				if(isTimerRun){
+					t.stop();
+					isTimerRun=false;
+				}
+			}else{
+				if(!isTimerRun){
+					t.start();
+					isTimerRun=true;
+				}
+			}
 			pid::psetX(val.x);
-			pid::psetY(val.y);
+			pid::psetY(yMult*val.y);
 			return false;
 		}
 	}
@@ -31,6 +63,10 @@ namespace auco{
 	statusCmd readCmdsts();
 	
 	void setup(){
+		pointc startp=coord::otsk(0);
+		sensor::setX(startp.x);
+		sensor::setY(startp.y);
+		
 		turnCmd(STOP);
 	}
 	void loop(){
