@@ -13,6 +13,7 @@
 #include "com.hpp"
 #include "useful.hpp"
 #include "mautoCore.hpp"
+#include "aTapeLED.hpp"
 
 /*
 	構造☆彡
@@ -59,6 +60,29 @@ int main(){
 	rcv::setup();
 	emerg::setup();
 	
+	aTapeLED tape(PA_11,PB_2,PB_9);
+	tape.r=0.5;
+		tape.b=0.5;
+		tape.g=0.5;
+	while(true){
+		pc.printf("0x808080 ");
+		tape.color(0x808080);
+		wait(0.5);
+		pc.printf("0x800000 ");
+		tape.color(0x800000);
+		wait(0.5);
+		pc.printf("0x008000 ");
+		tape.color(0x008000);
+		wait(0.5);
+		pc.printf("0x000080 ");
+		tape.color(0x000080);
+		wait(0.5);
+		pc.printf("\n");
+		tape.color(0x000000);
+		wait(0.5);
+		
+	}
+	return 0;
 	
 	pc.printf("\nWelcome to Haruna's Movement Controller Nova\n");
 	/*

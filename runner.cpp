@@ -205,6 +205,8 @@ namespace mt=motor;
 
 //move control
 namespace mc{
+	DigitalIn fieldSw(PB_15);
+	bool isBlueFieldVal=true;
 	
 	void setup(){
 		pid::setup();
@@ -212,6 +214,8 @@ namespace mc{
 		mt::setup();
 	}
 	void loop(){
+		isBlueFieldVal=fieldSw;
+		
 		pid::loop();
 		//outLoopは最後に呼ばれなければならない
 		out::loop();
@@ -226,7 +230,6 @@ namespace mc{
 		return isIsiStopVal;
 	}
 	
-	bool isBlueFieldVal=true;
 	void setBlueField(bool val){
 		isBlueFieldVal=val;
 	}

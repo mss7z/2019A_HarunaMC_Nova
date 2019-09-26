@@ -15,6 +15,9 @@ namespace coord{
 	
 	const pointc ENDCOORD={0xfffffff,0xfffffff};
 	pointc otsk(int);
+	
+	pointc walkerGo(int);
+	pointc walkerBack(int);
 };
 
 #endif

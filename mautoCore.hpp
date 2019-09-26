@@ -19,6 +19,7 @@ namespace auco{
 		OTSK=1,
 		SHOT,
 		GOBACK,
+		WALKER,
 	};
 	enum statusCmd{
 		EMERG=1,

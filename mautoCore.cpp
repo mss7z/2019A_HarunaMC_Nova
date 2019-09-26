@@ -61,6 +61,7 @@ namespace auco{
 	statusCmd cmdsts;
 	void procCmdnow();
 	statusCmd readCmdsts();
+	void procWalker();
 	
 	void setup(){
 		pointc startp=coord::otsk(0);
@@ -97,26 +98,40 @@ namespace auco{
 			player::set(coord::otsk);
 			break;
 			
+			case WALKER:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			sensor::setX(0);
+			sensor::setY(0);
+			break;
+			
 			default:
 			pc.printf("unk cmd! %3d(0x%2X)\n",(int)cmd,(int)cmd);
 			break;
 		}
 	}
 	void procCmdnow(){//loop的な
-		switch((int)cmdnow){
-			case STOP:
-			//何もしない
-			break;
-			
-			case OTSK:
-			if(player::isPlayEnd()){
-				cmdsts=MOVED;
+		if(cmdsts==MOVING){
+			switch((int)cmdnow){
+				case STOP:
+				//何もしない
+				break;
+				
+				case OTSK:
+				if(player::isPlayEnd()){
+					cmdsts=MOVED;
+				}
+				break;
+				
+				case WALKER:
+				procWalker();
+				break;
+				
+				default:
+				pc.printf("FATAL ERR in mautoCore procCmdnow default called!!\n");
+				break;
 			}
-			break;
-			
-			default:
-			pc.printf("FATAL ERR in mautoCore procCmdnow default called!!\n");
-			break;
 		}
 	}
 	statusCmd readCmdsts(){
@@ -130,6 +145,28 @@ namespace auco{
 		}else{
 			isEmerg=is;
 			//cmdsts=MOVED;
+		}
+	}
+	void procWalker(){
+		static int cont=0;
+		switch(cont){
+			case 0:
+			player::set(coord::walkerGo);
+			cont++;
+			//意図的にbreakなし
+			case 1:
+			if(player::isPlayEnd()){
+				player::set(coord::walkerBack);
+				cont++;
+			}
+			break;
+			
+			case 2:
+			if(player::isPlayEnd()){
+				cont=0;
+				cmdsts=MOVED;
+			}
+			break;
 		}
 	}
 };
