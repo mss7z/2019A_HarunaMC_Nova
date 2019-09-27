@@ -45,10 +45,11 @@ class point:
 			self.belong.draw()
 			if self.belong.nextLine!=None:
 				self.belong.nextLine.draw()
-	def set(self,xa,ya):
-		self.x=xa
-		self.y=ya
+	def set(self,val):
+		self.x,self.y=val
 		self.update()
+	def get(self):
+		return (self.x,self.y)
 	def distSq(self,xa,ya):
 		return (self.x-xa)**2 + (self.y-ya)**2
 	def selected(self,isv):
@@ -62,9 +63,11 @@ class point:
 		self.p.remove()
 
 class lineClass:
-	def __init__(self):
+	def __init__(self,val):
 		self.nextLine=None
 		self.preLine=None
+		if val!=None:
+			self.set(val)
 		print("line called")
 	def draw(self,detail=0):
 		pass
@@ -86,32 +89,63 @@ class lineClass:
 	def fl(self,l):
 		return self.f(l/self.calcedLen)
 	def flC(self,l):
+		"""すべてのライン長を計算するために自分の次のラインも計算に入れる"""
 		#self.len()
 		if l<=self.calcedLen:
 			return self.fl(l)
 		else:
 			return self.nextLine.flC(l-self.calcedLen)
+	def genGet(self,val):
+		"""generator"""
+		return (self.__class__.__name__,val)
+		
+	def addLine(self,new):
+		if self.nextLine==None:
+			self.nextLine=new(self.end)
+			self.nextLine.preLine=self
+			self.nextLine.draw()
+			return self.nextLine
+		else:
+			return None
+	def getC(self,list):
+		list.append(self.get())
+		if self.nextLine!=None:
+			self.nextLine.getC(list)
+		return list
+	def setC(self,list):
+		line=list.pop(0)
+		self.set(line[1])
+		if len(list)!=0:
+			print(list[0])
+			self.addLine(eval(list[0][0]))
+			self.nextLine.setC(list)
+
 
 class startl(lineClass):
-	def __init__(self):
-		super().__init__()
+	def __init__(self,frma=None,val=None):
 		self.end=point(belong=self,marker="*")
+		super().__init__(val)
 	def delete(self):
 		raise ValueError("この点は消せません")
 	def f(self,t=0):
 		return (self.end.x,self.end.y)
 	def fl(self,l=0):
 		return self.f()
+	def get(self):
+		return self.genGet((self.end.get(),))
+	def set(self,val):
+		end,=val
+		self.end.set(end)
 	
 class bazier(lineClass):
-	def __init__(self,frma):
-		super().__init__()
+	def __init__(self,frma,val=None):
 		self.frm=frma
 		self.p1=point(belong=self)
 		self.p2=point(belong=self)
 		self.end=point(belong=self)
 		self.len()
 		self.line,=ax.plot(0,0)
+		super().__init__(val)
 		print("maked bazier")
 	def f(self,t):
 		x=(1-t)**3*self.frm.x + 3*(1-t)**2*t*self.p1.x + 3*(1-t)*t**2*self.p2.x + t**3*self.end.x
@@ -141,14 +175,21 @@ class bazier(lineClass):
 		self.p2.delete()
 		self.end.delete()
 		self.line.remove()
+	def get(self):
+		return self.genGet((self.p1.get(),self.p2.get(),self.end.get()))
+	def set(self,val):
+		p1,p2,end=val
+		self.p1.set(p1)
+		self.p2.set(p2)
+		self.end.set(end)
 
 class straight(lineClass):
-	def __init__(self,frma):
-		super().__init__()
+	def __init__(self,frma,val=None):
 		self.frm=frma
 		self.end=point(belong=self)
 		self.len()
 		self.line,=ax.plot(0,0)
+		super().__init__(val)
 		print("maked bazier")
 	def f(self,t):
 		x=(1-t)*self.frm.x+t*self.end.x
@@ -164,6 +205,11 @@ class straight(lineClass):
 	def delete(self):
 		self.end.delete()
 		self.line.remove()
+	def get(self):
+		return self.genGet((self.end.get(),))
+	def set(self,val):
+		end,=val
+		self.end.set(end)
 	
 def click(event):
 	global dragP,slctP
@@ -181,7 +227,7 @@ def motion(event):
 		return
 	if event.xdata==None or event.ydata==None:
 		return
-	dragP.set(event.xdata,event.ydata)
+	dragP.set((event.xdata,event.ydata))
 
 def release(event):
 	global dragP
@@ -196,10 +242,11 @@ def delLine(line):
 	line.preLine.nextLine=None
 	del line
 
+"""
 def addLine(line,new):
 	line.nextLine=new(line.end)
 	line.nextLine.preLine=line
-	line.nextLine.draw()
+	line.nextLine.draw()"""
 
 def genSlope(x):
 	#return (math.sin((x-0.5)*math.pi)+1.0)/2.0
@@ -244,11 +291,11 @@ def key(event):
 	elif event.key=='a':
 		if slctP!=None:
 			if slctP.belong != None:
-				addLine(slctP.belong,bazier)
+				slctP.belong.addLine(bazier)
 	elif event.key=='z':
 		if slctP!=None:
 			if slctP.belong != None:
-				addLine(slctP.belong,straight)
+				slctP.belong.addLine(straight)
 	elif event.key=='d':
 		if slctP!=None:
 			if slctP.belong != None:
@@ -261,11 +308,16 @@ def key(event):
 		genCoord()
 		print("len {}".format(line.lenC()))
 	elif event.key=='t':
-		for i in range(0,1500,10):
+		"""for i in range(0,1500,10):
 			spd=int(genSpeed(i,1500)*10)
 			for j in range(spd):
 				print(" ",end="")
-			print("0")
+			print("0")"""
+		listx=list()
+		print(line.getC(listx))
+		monx=startl()
+		monx.setC(listx)
+		
 key.nowDragSetting=False
 
 #スタート

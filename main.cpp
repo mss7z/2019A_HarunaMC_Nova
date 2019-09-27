@@ -13,7 +13,6 @@
 #include "com.hpp"
 #include "useful.hpp"
 #include "mautoCore.hpp"
-#include "aTapeLED.hpp"
 
 /*
 	構造☆彡
