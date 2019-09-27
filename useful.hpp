@@ -48,6 +48,7 @@ namespace mylib{
 		}
 		void set(unsigned long val){interval=val;}
 		unsigned long read(){return interval;}
+		operator bool(){return ist();}
 	};
 	
 	class trueFalse{

@@ -214,12 +214,25 @@ namespace mc{
 		mt::setup();
 	}
 	void loop(){
-		isBlueFieldVal=fieldSw;
+		static mylib::regularC fieldTime(100);
+		if(fieldTime){
+			isBlueFieldVal=fieldSw;
+			//pc.printf("hey!\n");
+			if(isBlueFieldVal){
+				tl=aTapeLEDlib::BLUE*1.0;
+			}else{
+				tl=aTapeLEDlib::RED*1.0;
+			}
+			//tl=0xff;
+		}
 		
 		pid::loop();
 		//outLoopは最後に呼ばれなければならない
 		out::loop();
 	}
+	
+	
+	aTapeLED tl(PA_11,PB_2,PB_6);
 	
 	//上級が停止の意思があるかを示す（上級は止めているが下級のほうでPIDなどでマシンが動いてもよい）
 	bool isIsiStopVal;

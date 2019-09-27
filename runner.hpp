@@ -8,6 +8,7 @@
 #include "aPid.hpp"
 #include "aRotaryEncoder.hpp"
 #include "aRedUS.hpp"
+#include "aTapeLED.hpp"
 
 #include "useful.hpp"
 #include <math.h>
@@ -111,6 +112,8 @@ namespace mt=motor;
 
 //movement control runnerの長
 namespace mc{
+	extern aTapeLED tl;
+	
 	void setup();
 	void loop();
 	
