@@ -5,16 +5,17 @@ namespace player{
 	coordFunc nowf=NULL;
 	Timer t;
 	bool isTimerRun;
-	float yMult=1.0;
+	float xMult=1.0;
 	
 	void set(coordFunc);
 	bool isPlayEnd();
 	
 	void loop(){
 		if(mc::isBlueField()){
-			yMult=1.0;
+			//pc.printf("blue !");
+			xMult=-1.0;
 		}else{
-			yMult=-1.0;
+			xMult=1.0;
 		}
 	}
 	
@@ -47,8 +48,8 @@ namespace player{
 					isTimerRun=true;
 				}
 			}
-			pid::psetX(val.x);
-			pid::psetY(yMult*val.y);
+			pid::psetX(xMult*val.x);
+			pid::psetY(val.y);
 			return false;
 		}
 	}
@@ -72,6 +73,7 @@ namespace auco{
 	}
 	void loop(){
 		procCmdnow();
+		player::loop();
 	}
 	
 	//cmdを切り替えるときに呼ぶ　初期化などをする

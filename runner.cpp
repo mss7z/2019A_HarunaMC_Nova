@@ -185,10 +185,10 @@ namespace motor{
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
 	
-	aMt &q1=m3;
-	aMt &q2=m1;
-	aMt &q3=m2;
-	aMt &q4=m4;
+	aMt &q1=m1;
+	aMt &q2=m3;
+	aMt &q3=m4;
+	aMt &q4=m2;
 	
 	aMt *q[MTDS]={&q1,&q2,&q3,&q4};
 	float o[MTDS];
