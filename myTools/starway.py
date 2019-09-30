@@ -58,7 +58,6 @@ class point:
 		else:
 			self.p.set_sizes((10,))
 	def delete(self):
-		print("call delete !!!!!!!")
 		self.delPoints(self)
 		self.p.remove()
 
@@ -68,7 +67,6 @@ class lineClass:
 		self.preLine=None
 		if val!=None:
 			self.set(val)
-		print("line called")
 	def draw(self,detail=0):
 		pass
 	def delete(self):
@@ -107,16 +105,27 @@ class lineClass:
 			return self.nextLine
 		else:
 			return None
-	def getC(self,list):
+	def delC(self):
+		if self.nextLine!=None:
+			self.nextLine.delC()
+			#参照を含むのでそのままだと消されない、そのためにまず手動で参照を消す
+			self.nextLine.delete()
+			del self.nextLine
+			self.nextLine=None
+	def getC(self):
+		vals=list()
+		self.getCinternal(vals)
+		return vals
+	def getCinternal(self,list):
 		list.append(self.get())
 		if self.nextLine!=None:
-			self.nextLine.getC(list)
+			self.nextLine.getCinternal(list)
 		return list
 	def setC(self,list):
 		line=list.pop(0)
 		self.set(line[1])
 		if len(list)!=0:
-			print(list[0])
+			#print(list[0])
 			self.addLine(eval(list[0][0]))
 			self.nextLine.setC(list)
 
@@ -146,7 +155,6 @@ class bazier(lineClass):
 		self.len()
 		self.line,=ax.plot(0,0)
 		super().__init__(val)
-		print("maked bazier")
 	def f(self,t):
 		x=(1-t)**3*self.frm.x + 3*(1-t)**2*t*self.p1.x + 3*(1-t)*t**2*self.p2.x + t**3*self.end.x
 		y=(1-t)**3*self.frm.y + 3*(1-t)**2*t*self.p1.y + 3*(1-t)*t**2*self.p2.y + t**3*self.end.y
@@ -190,7 +198,6 @@ class straight(lineClass):
 		self.len()
 		self.line,=ax.plot(0,0)
 		super().__init__(val)
-		print("maked bazier")
 	def f(self,t):
 		x=(1-t)*self.frm.x+t*self.end.x
 		y=(1-t)*self.frm.y+t*self.end.y
@@ -210,10 +217,34 @@ class straight(lineClass):
 	def set(self,val):
 		end,=val
 		self.end.set(end)
-	
+
+class memory:
+	def __init__(self,fileName):
+		self.fileName=fileName
+		self.lineList=[self.defoVal() for i in range(10)]
+	def defoVal(self):
+		return [("startl",((0,0),)),]
+	def write(self):
+		with open(self.fileName,"wb") as file:
+			print("write")
+			print(self.lineList)
+			pickle.dump(self.lineList,file)
+	def read(self):
+		with open(self.fileName,"rb") as file:
+			
+			self.lineList=pickle.load(file)
+			print("read")
+			print(self.lineList)
+	def recall(self,line,number):
+		line.delC()
+		list=self.lineList[number].copy()
+		line.setC(list)
+	def memorize(self,line,number):
+		self.lineList[number]=line.getC()
+
 def click(event):
 	global dragP,slctP
-	print("button={} x={} y={}".format(event.button,event.xdata,event.ydata))
+	#print("button={} x={} y={}".format(event.button,event.xdata,event.ydata))
 	if slctP != None:
 		slctP.selected(False)
 	dist,dragP=point.nearPoint(event.xdata,event.ydata)
@@ -231,9 +262,9 @@ def motion(event):
 
 def release(event):
 	global dragP
-	print("release")
 	dragP=None
 	line.drawC(0.01)
+
 
 def delLine(line):
 	print("line del")
@@ -276,17 +307,22 @@ def genCoord():
 		i+=genSpeed(i,total)+0.1
 	pass
 
+def setDrag(isv):
+	if isv:
+		setDrag.clickCid=fig.canvas.mpl_connect('button_press_event',click)
+		setDrag.motionCid=fig.canvas.mpl_connect('motion_notify_event',motion)
+		setDrag.releaseCid=fig.canvas.mpl_connect('button_release_event',release)
+		print("マウス入力を受付しています")
+	else:
+		fig.canvas.mpl_disconnect(setDrag.clickCid)
+		fig.canvas.mpl_disconnect(setDrag.motionCid)
+		fig.canvas.mpl_disconnect(setDrag.releaseCid)
+		print("マウス入力の受付を中止しました")
+
 def key(event):
-	global slctP,line
+	global slctP,line,mem,killFlg
 	if event.key=='w':
-		if key.nowDragSetting:
-			fig.canvas.mpl_disconnect(key.clickCid)
-			fig.canvas.mpl_disconnect(key.motionCid)
-			fig.canvas.mpl_disconnect(key.releaseCid)
-		else:
-			key.clickCid=fig.canvas.mpl_connect('button_press_event',click)
-			key.motionCid=fig.canvas.mpl_connect('motion_notify_event',motion)
-			key.releaseCid=fig.canvas.mpl_connect('button_release_event',release)
+		setDrag(key.nowDragSetting)
 		key.nowDragSetting=not key.nowDragSetting
 	elif event.key=='a':
 		if slctP!=None:
@@ -306,35 +342,65 @@ def key(event):
 					print("次のラインがあるため消せない")
 	elif event.key=='i':
 		genCoord()
-		print("len {}".format(line.lenC()))
+		print("length= {}".format(line.lenC()))
 	elif event.key=='t':
-		"""for i in range(0,1500,10):
-			spd=int(genSpeed(i,1500)*10)
-			for j in range(spd):
-				print(" ",end="")
-			print("0")"""
-		listx=list()
-		print(line.getC(listx))
-		monx=startl()
-		monx.setC(listx)
-		
+		pass
+	elif '0'<=event.key and event.key<='9':
+		switchLine(int(event.key))
+	elif event.key=='x':
+		killFlg=True
 key.nowDragSetting=False
+
+def switchLine(number):
+	global mem,line,nowMem
+	mem.memorize(line,nowMem)
+	mem.recall(line,number)
+	nowMem=number
+	print(str(number)+"がリコールされました")
+
+def killProgram():
+	global line
+	mem.memorize(line,nowMem)
+	mem.write()
+	plt.close()
+	print("プログラムを停止します")
+	exit(0)
 
 #スタート
 
+print("自動機経路生成支援プログラム  Starway Alpha  by mss7z")
+
+#matplotlibへ設定
 fig=plt.figure()
 ax=fig.add_subplot(1,1,1)
-
-line=startl()
-	
 ax.imshow(plt.imread(fieldImageName))
 ax.invert_yaxis()
-
 fig.canvas.mpl_connect('key_press_event',key)
 
+#基本点生成
+line=startl()
+
+killFlg=False
+
+#保存システム初期化
+mem=memory(lineFileName)
+nowMem=0
+try:
+	mem.read()
+except:
+	print(lineFileName+" が無いようだ")
+mem.recall(line,0)
+
+#マウス操作
 dragP=None
 slctP=None
+setDrag(True)
 
 while True:
-	plt.pause(0.05)
-
+	try:
+		plt.pause(0.05)
+	except:
+		print("警告:メインループに例外発生!")
+		killProgram()
+	if killFlg:
+		killProgram()
