@@ -171,6 +171,7 @@ namespace emergency{
 	}
 	
 	void receive(uint8_t data[],uint16_t size){
+		//pc.printf("gm!\n");
 		switch(data[0]){
 		case 0x97://remote at command response
 			/*for(int i=0;i<size;i++){
@@ -179,19 +180,24 @@ namespace emergency{
 			procCmdReponse(data,size);
 			break;
 		default:
+			pc.printf("gm 0x%02X\n",data[0]);
 			break;
 		}
 		return;
 	}
 	
 	void procCmdReponse(uint8_t data[],uint16_t size){
+		//pc.printf("cmdRep\n");
 		if(data[12]=='I' && data[13]=='S'){//at cmd
 			if(data[14]==0x00){//at cmd statusが0x00(SUCCESS)なら
+				//pc.printf("re!\n");
 				isEmerg=((data[20]>>1)&0x1);//DIO1がHIGHか？
 				//mt::isStop=isEmerg;
 				mt::emergStopIs(isEmerg);
 				auco::emergIs(isEmerg);
 			}
-		}
+		}/*else{
+			pc.printf("cmd %c %c",(char)data[12],(char)data[13]);
+		}pc.printf("emg err 0x%02X",data[14]);*/
 	}
 }

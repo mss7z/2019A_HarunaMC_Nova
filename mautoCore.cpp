@@ -72,6 +72,10 @@ namespace auco{
 		turnCmd(STOP);
 	}
 	void loop(){
+		static mylib::regularC time(500);
+		if(time){
+			pc.printf("cmdnow=%d cmdsts=%d\n",(int)cmdnow,(int)cmdsts);
+		}
 		procCmdnow();
 		player::loop();
 	}
@@ -79,7 +83,7 @@ namespace auco{
 	//cmdを切り替えるときに呼ぶ　初期化などをする
 	void turnCmd(parentCmd cmd){//setupてきな
 		if(isEmerg){
-			pc.printf("emg!\n");
+			//pc.printf("emg!\n");
 			return;
 		}
 		cmdnow=cmd;

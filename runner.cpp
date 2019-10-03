@@ -15,7 +15,7 @@ namespace sensor{
 	
 	void setup(){
 		gyro.startDeg();
-		calcXYtime.attach(calcXY,0.01);
+		calcXYtime.attach(calcXY,0.02);
 		dx.reset();
 		dy.reset();
 	}
@@ -185,10 +185,10 @@ namespace motor{
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
 	
-	aMt &q1=m1;
-	aMt &q2=m3;
-	aMt &q3=m4;
-	aMt &q4=m2;
+	aMt &q1=m2;
+	aMt &q2=m4;
+	aMt &q3=m3;
+	aMt &q4=m1;
 	
 	aMt *q[MTDS]={&q1,&q2,&q3,&q4};
 	float o[MTDS];

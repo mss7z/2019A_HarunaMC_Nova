@@ -67,9 +67,10 @@ int main(){
 	mt::m2.set(0.3);
 	mt::m3.set(0.6);
 	mt::m4.set(1.0);
-	return 0;*/
-	
-	/*mt::q1.set(0.1);
+	return 0;
+	*/
+	/*
+	mt::q1.set(0.1);
 	mt::q2.set(0.3);
 	mt::q3.set(0.6);
 	mt::q4.set(1.0);
