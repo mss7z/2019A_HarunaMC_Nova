@@ -80,7 +80,6 @@ class lineClass:
 			self.nextLine.drawC(detail)
 	def lenC(self):
 		if self.nextLine==None:
-			print(self.len())
 			return self.len()
 		else:
 			return self.len()+self.nextLine.lenC()
@@ -89,7 +88,8 @@ class lineClass:
 	def flC(self,l):
 		"""すべてのライン長を計算するために自分の次のラインも計算に入れる"""
 		#self.len()
-		if l<=self.calcedLen:
+		#print("l is"+str(l))
+		if l<=self.calcedLen or self.nextLine==None:
 			return self.fl(l)
 		else:
 			return self.nextLine.flC(l-self.calcedLen)
@@ -298,13 +298,23 @@ def genSpeed(now,total):
 	else:
 		return tagSpd
 
+def printaCoord(i):
+	x,y=line.flC(i)
+	print("{{{},{}}},".format(int(x*mmPerPixcel),int(y*mmPerPixcel)),end="")
+
 def genCoord():
 	total=line.lenC()
 	i=0
 	while i<=total:
-		x,y=line.flC(i)
-		print("{{{},{}}},".format(int(x*mmPerPixcel),int(y*mmPerPixcel)),end="")
+		printaCoord(i)
 		i+=genSpeed(i,total)+0.1
+	pass
+def genCoordReverse():
+	total=line.lenC()
+	i=total
+	while i>=0:
+		printaCoord(i)
+		i-=genSpeed(i,total)+0.1
 	pass
 
 def setDrag(isv):
@@ -342,7 +352,10 @@ def key(event):
 					print("次のラインがあるため消せない")
 	elif event.key=='i':
 		genCoord()
-		print("length= {}".format(line.lenC()))
+		print("\n正転再生終了")
+	elif event.key=='u':
+		genCoordReverse()
+		print("\n逆転再生終了")
 	elif event.key=='t':
 		pass
 	elif '0'<=event.key and event.key<='9':
