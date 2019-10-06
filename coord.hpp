@@ -18,6 +18,16 @@ namespace coord{
 	
 	pointc walkerGo(int);
 	pointc walkerBack(int);
+	
+	pointc towel1(int);
+	pointc towel2(int);
+	
+	pointc sheetsReadWall(int);
+	pointc sheetsExtendPoll(int);
+	pointc sheetsBomStarting(int);
+	pointc sheetsBomRunning(int);
+	
+	pointc goback(int);
 };
 
 #endif

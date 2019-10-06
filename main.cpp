@@ -81,6 +81,19 @@ int main(){
 	out::setY(0.5);
 	mc::loop();
 	return 0;*/
+	/*mylib::regularC time(500);
+	while(true){
+		sensor::isReadRedSuc();
+		if(time){
+			if(sensor::isReadRedSuc()){
+				pc.printf("ok  ");
+				sensor::reviseDegByRed();
+			}else{
+				pc.printf("    ");
+			}
+			pc.printf("%10sdeg\n",flt(sensor::deg()));
+		}
+	}*/
 	
 	while (true){
 		monitor::loop();

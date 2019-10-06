@@ -17,7 +17,10 @@ namespace auco{
 	enum parentCmd{
 		STOP=0,
 		OTSK=1,
-		SHOT,
+		TOWEL1,
+		TOWEL2,
+		SHEETS,
+		SHEETS_BOM,
 		GOBACK,
 		WALKER,
 	};

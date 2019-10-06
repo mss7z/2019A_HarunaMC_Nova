@@ -42,8 +42,8 @@ namespace sensor{
 		const int TIMEOUT=5*1000;//us?
 		aRedUS bluef(PC_3,TIMEOUT);
 		aRedUS blueb(PC_2,TIMEOUT);
-		aRedUS redf(PH_1,TIMEOUT);
-		aRedUS redb(PA_15,TIMEOUT);
+		aRedUS redf(PA_15,TIMEOUT);
+		aRedUS redb(PH_1,TIMEOUT);
 		aRedUS front(PB_13,TIMEOUT);
 		aRedUS back(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
@@ -118,7 +118,7 @@ namespace sensor{
 		}
 		return;
 	}
-	
+	/*
 	//RedUSによるセンサー補正の管理人
 	void reviseByRedUS(){
 		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
@@ -135,11 +135,118 @@ namespace sensor{
 				}
 				//pc.printf("b\n");
 			}
-			reviseGyroExt();
+			//reviseGyroExt();
 			//reviseXExt();
 			//pc.printf("hey\n");
 		}
+	}*/
+	bool isReadBlueSuc(){//Success
+		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
+		//時間を制限するためのregularC
+		static mylib::trueFalse witch(true);
+		static bool isNotTimeoutF=true,isNotTimeoutB=true;
+		if(rvs.ist()){
+			if(witch.get()){
+				if(redus::bluef.update()==aRedUS::TIMEOUT){
+					redus::bluef.reset();
+					isNotTimeoutF=false;
+				}else{
+					isNotTimeoutF=true;
+				}
+			}else{
+				if(redus::blueb.update()==aRedUS::TIMEOUT){
+					redus::blueb.reset();
+					isNotTimeoutB=false;
+				}else{
+					isNotTimeoutB=true;
+				}
+			}
+		}
+		return isNotTimeoutF && isNotTimeoutB;
 	}
+	void reviseDegByBlue(){
+		float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/400.0))/M_PI;
+		gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+	}
+	void resetBlue(){
+		redus::bluef.reset();
+		redus::blueb.reset();
+	}
+	void reviseByBlue(){
+		if(isReadBlueSuc()){
+			reviseDegByBlue();
+		}
+	}
+	
+	bool isReadRedSuc(){//Success
+		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
+		//時間を制限するためのregularC
+		static mylib::trueFalse witch(true);
+		static bool isNotTimeoutF=true,isNotTimeoutB=true;
+		if(rvs.ist()){
+			if(witch.get()){
+				if(redus::redf.update()==aRedUS::TIMEOUT){
+					redus::redf.reset();
+					isNotTimeoutF=false;
+				}else{
+					isNotTimeoutF=true;
+				}
+			}else{
+				if(redus::redb.update()==aRedUS::TIMEOUT){
+					redus::redb.reset();
+					isNotTimeoutB=false;
+				}else{
+					isNotTimeoutB=true;
+				}
+			}
+		}
+		return isNotTimeoutF && isNotTimeoutF;
+	}
+	void reviseDegByRed(){
+		float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/400.0))/M_PI;
+		gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+	}
+	void resetRed(){
+		redus::redf.reset();
+		redus::redb.reset();
+	}
+	void reviseByRed(){
+		if(isReadRedSuc()){
+			reviseDegByRed();
+		}
+	}
+	
+	void resetFarw(){
+		if(mc::isBlueField()){
+			resetRed();
+		}else{
+			resetBlue();
+		}
+	}
+	void resetHomew(){
+		if(mc::isBlueField()){
+			resetBlue();
+		}else{
+			resetRed();
+		}
+	}
+	void reviseByFarw(){
+		if(mc::isBlueField()){
+			reviseByRed();
+		}else{
+			reviseByBlue();
+		}
+	}
+	void reviseByHomew(){
+		if(mc::isBlueField()){
+			reviseByBlue();
+		}else{
+			reviseByRed();
+		}
+	}
+	
+	
+	/*
 	//超音波距離計による角度算出とジャイロの補正
 	void reviseGyroExt(){
 		static mylib::delta<float> dg((float)readRedUSinterval/1000.0);
@@ -160,7 +267,7 @@ namespace sensor{
 			//マシンの外から中央までの距離280mm???????????????????????????????????????????????????????????????????
 			xv=((fp->readMM()+bp->readMM())/2.0)+280.0;
 		}
-	}
+	}*/
 }
 
 namespace motor{

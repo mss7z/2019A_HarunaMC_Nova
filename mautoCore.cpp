@@ -62,6 +62,9 @@ namespace auco{
 	statusCmd cmdsts;
 	void procCmdnow();
 	statusCmd readCmdsts();
+	
+	void procSheets();
+	void procSheetsBom();
 	void procWalker();
 	
 	void setup(){
@@ -104,6 +107,39 @@ namespace auco{
 			player::set(coord::otsk);
 			break;
 			
+			case TOWEL1:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			player::set(coord::towel1);
+			break;
+			
+			case TOWEL2:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			player::set(coord::towel2);
+			break;
+			
+			case SHEETS:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			break;
+			
+			case SHEETS_BOM:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			break;
+			
+			case GOBACK:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			player::set(coord::goback);
+			break;
+			
 			case WALKER:
 			mc::setIsiStop(false);
 			pid::turnX(true);
@@ -130,6 +166,31 @@ namespace auco{
 				}
 				break;
 				
+				case TOWEL1:
+				if(player::isPlayEnd()){
+					cmdsts=MOVED;
+				}
+				break;
+				
+				case TOWEL2:
+				if(player::isPlayEnd()){
+					cmdsts=MOVED;
+				}
+				break;
+				
+				case SHEETS:
+				procSheets();
+				break;
+				
+				case SHEETS_BOM:
+				procSheetsBom();
+				break;
+				
+				case GOBACK:
+				if(player::isPlayEnd()){
+					cmdsts=MOVED;
+				}
+				
 				case WALKER:
 				procWalker();
 				break;
@@ -151,6 +212,68 @@ namespace auco{
 		}else{
 			isEmerg=is;
 			//cmdsts=MOVED;
+		}
+	}
+	void procSheets(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			player::set(coord::sheetsReadWall);
+			cont++;
+			//意図的にbreakなし
+			
+			case 1:
+			if(player::isPlayEnd()){
+				if(mc::isBlueField()){
+					sensor::resetRed();
+				}else{
+					sensor::resetBlue();
+				}
+				cont++;
+				time.reset();
+				time.start();
+			}
+			break;
+			
+			case 2:
+			if(mc::isBlueField()){
+				if(sensor::isReadRedSuc()){
+				}
+			}
+			
+			case 3:
+			player::set(coord::sheetsExtendPoll);
+			cont++;
+			
+			case 4:
+			if(player::isPlayEnd()){
+				cmdsts=MOVED;
+				cont=0;
+			}
+			break;
+		}
+	}
+	void procSheetsBom(){
+		static int cont=0;
+		switch(cont){
+			case 0:
+			player::set(coord::sheetsBomStarting);
+			cont++;
+			//意図的にbreakなし
+			case 1:
+			if(player::isPlayEnd()){
+				player::set(coord::sheetsBomRunning);
+				cont++;
+			}
+			break;
+			
+			case 2:
+			if(player::isPlayEnd()){
+				cmdsts=MOVED;
+				cont=0;
+			}
+			break;
 		}
 	}
 	void procWalker(){

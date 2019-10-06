@@ -66,6 +66,11 @@ namespace sensor{
 	float y();
 	void setX(float);
 	void setY(float);
+	
+	bool isReadBlueSuc();
+	void reviseDegByBlue();
+	bool isReadRedSuc();
+	void reviseDegByRed();
 }
 
 namespace motor{
