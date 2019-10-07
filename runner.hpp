@@ -67,10 +67,14 @@ namespace sensor{
 	void setX(float);
 	void setY(float);
 	
-	bool isReadBlueSuc();
+	/*bool isReadBlueSuc();
 	void reviseDegByBlue();
 	bool isReadRedSuc();
-	void reviseDegByRed();
+	void reviseDegByRed();*/
+	void resetFarw();
+	void resetHomew();
+	void reviseByFarw();
+	void reviseByHomew();
 }
 
 namespace motor{

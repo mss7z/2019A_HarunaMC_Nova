@@ -68,9 +68,7 @@ namespace auco{
 	void procWalker();
 	
 	void setup(){
-		pointc startp=coord::otsk(0);
-		sensor::setX(startp.x);
-		sensor::setY(startp.y);
+		
 		
 		turnCmd(STOP);
 	}
@@ -100,13 +98,16 @@ namespace auco{
 			cmdsts=MOVED;
 			break;
 			
-			case OTSK:
+			case OTSK:{
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
 			player::set(coord::otsk);
+			pointc startp=coord::otsk(0);
+			sensor::setX(startp.x);
+			sensor::setY(startp.y);
 			break;
-			
+			}
 			case TOWEL1:
 			mc::setIsiStop(false);
 			pid::turnX(true);
@@ -226,9 +227,9 @@ namespace auco{
 			case 1:
 			if(player::isPlayEnd()){
 				if(mc::isBlueField()){
-					sensor::resetRed();
+					//sensor::resetRed();
 				}else{
-					sensor::resetBlue();
+				//	sensor::resetBlue();
 				}
 				cont++;
 				time.reset();
@@ -237,10 +238,10 @@ namespace auco{
 			break;
 			
 			case 2:
-			if(mc::isBlueField()){
+			/*if(mc::isBlueField()){
 				if(sensor::isReadRedSuc()){
 				}
-			}
+			}*/
 			
 			case 3:
 			player::set(coord::sheetsExtendPoll);

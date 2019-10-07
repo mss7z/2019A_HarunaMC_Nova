@@ -62,6 +62,7 @@ int main(){
 	//return 0;
 	
 	pc.printf("\nWelcome to Haruna's Movement Controller Nova\n");
+	//pc.printf("double size:%d\n",(int)sizeof(sin(0)));
 	/*
 	mt::m1.set(0.1);
 	mt::m2.set(0.3);

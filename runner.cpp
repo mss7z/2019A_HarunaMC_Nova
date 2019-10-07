@@ -2,26 +2,26 @@
 
 
 namespace sensor{
-	float xv=0.0,yv=0.0;
+	double xv=0.0,yv=0.0;
 	Ticker calcXYtime;
-	mylib::delta<float> dx,dy;
+	mylib::delta<double> dx,dy;
 	static const int readRedUSinterval=40;
 	
 	void reviseGyroOwn();
-	void reviseByRedUS();
+	//void reviseByRedUS();
 	void reviseGyroExt();
 	void reviseXExt();
 	void calcXY();
 	
 	void setup(){
 		gyro.startDeg();
-		calcXYtime.attach(calcXY,0.02);
+		calcXYtime.attach(calcXY,0.05);
 		dx.reset();
 		dy.reset();
 	}
 	void loop(){
 		//reviseGyroOwn();
-		reviseByRedUS();
+		//reviseByRedUS();
 		
 		if(mc::isBlueField()){
 			fp=&redus::bluef;
@@ -53,11 +53,12 @@ namespace sensor{
 	void calcXY(){
 		//エンコーダ1カウント当たり何ミリメートルか？
 		//static const float mmPerREcont=0.6258641615;//------------------------------------------------------sitei
-		static const float mmPerREcont=0.3098641192;//1回転1024パルス、円周101Pi、(101Pi)/1024
+		static const double mmPerREcont=0.3098641192;//1回転1024パルス、円周101Pi、(101Pi)/1024
 		//書いてて気が付いたけど、これって線形変換の回転移動？
-		const float dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
-		xv+=(dxv*cos(rad())-dyv*sin(rad()))*mmPerREcont;
-		yv+=(dxv*sin(rad())+dyv*cos(rad()))*mmPerREcont;
+		const double dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
+		const double r=rad();
+		xv+=(dxv*cos(r)-dyv*sin(r))*mmPerREcont;
+		yv+=(dxv*sin(r)+dyv*cos(r))*mmPerREcont;
 	}
 	
 	float x(){
@@ -140,108 +141,112 @@ namespace sensor{
 			//pc.printf("hey\n");
 		}
 	}*/
-	bool isReadBlueSuc(){//Success
-		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
-		//時間を制限するためのregularC
-		static mylib::trueFalse witch(true);
-		static bool isNotTimeoutF=true,isNotTimeoutB=true;
-		if(rvs.ist()){
-			if(witch.get()){
-				if(redus::bluef.update()==aRedUS::TIMEOUT){
-					redus::bluef.reset();
-					isNotTimeoutF=false;
+	namespace blue{
+		bool isReadSuc(){//Success
+			static mylib::regularC rvs(readRedUSinterval);//rvs=revise
+			//時間を制限するためのregularC
+			static mylib::trueFalse witch(true);
+			static bool isNotTimeoutF=true,isNotTimeoutB=true;
+			if(rvs.ist()){
+				if(witch.get()){
+					if(redus::bluef.update()==aRedUS::TIMEOUT){
+						redus::bluef.reset();
+						isNotTimeoutF=false;
+					}else{
+						isNotTimeoutF=true;
+					}
 				}else{
-					isNotTimeoutF=true;
-				}
-			}else{
-				if(redus::blueb.update()==aRedUS::TIMEOUT){
-					redus::blueb.reset();
-					isNotTimeoutB=false;
-				}else{
-					isNotTimeoutB=true;
+					if(redus::blueb.update()==aRedUS::TIMEOUT){
+						redus::blueb.reset();
+						isNotTimeoutB=false;
+					}else{
+						isNotTimeoutB=true;
+					}
 				}
 			}
+			return isNotTimeoutF && isNotTimeoutB;
 		}
-		return isNotTimeoutF && isNotTimeoutB;
-	}
-	void reviseDegByBlue(){
-		float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/400.0))/M_PI;
-		gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
-	}
-	void resetBlue(){
-		redus::bluef.reset();
-		redus::blueb.reset();
-	}
-	void reviseByBlue(){
-		if(isReadBlueSuc()){
-			reviseDegByBlue();
+		void reviseDeg(){
+			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/415.0))/M_PI;
+			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+		}
+		void reset(){
+			redus::bluef.reset();
+			redus::blueb.reset();
+		}
+		void revise(){
+			if(isReadSuc()){
+				reviseDeg();
+			}
 		}
 	}
 	
-	bool isReadRedSuc(){//Success
-		static mylib::regularC rvs(readRedUSinterval);//rvs=revise
-		//時間を制限するためのregularC
-		static mylib::trueFalse witch(true);
-		static bool isNotTimeoutF=true,isNotTimeoutB=true;
-		if(rvs.ist()){
-			if(witch.get()){
-				if(redus::redf.update()==aRedUS::TIMEOUT){
-					redus::redf.reset();
-					isNotTimeoutF=false;
+	namespace red{
+		bool isReadSuc(){//Success
+			static mylib::regularC rvs(readRedUSinterval);//rvs=revise
+			//時間を制限するためのregularC
+			static mylib::trueFalse witch(true);
+			static bool isNotTimeoutF=true,isNotTimeoutB=true;
+			if(rvs.ist()){
+				if(witch.get()){
+					if(redus::redf.update()==aRedUS::TIMEOUT){
+						redus::redf.reset();
+						isNotTimeoutF=false;
+					}else{
+						isNotTimeoutF=true;
+					}
 				}else{
-					isNotTimeoutF=true;
-				}
-			}else{
-				if(redus::redb.update()==aRedUS::TIMEOUT){
-					redus::redb.reset();
-					isNotTimeoutB=false;
-				}else{
-					isNotTimeoutB=true;
+					if(redus::redb.update()==aRedUS::TIMEOUT){
+						redus::redb.reset();
+						isNotTimeoutB=false;
+					}else{
+						isNotTimeoutB=true;
+					}
 				}
 			}
+			return isNotTimeoutF && isNotTimeoutB;
 		}
-		return isNotTimeoutF && isNotTimeoutF;
-	}
-	void reviseDegByRed(){
-		float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/400.0))/M_PI;
-		gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
-	}
-	void resetRed(){
-		redus::redf.reset();
-		redus::redb.reset();
-	}
-	void reviseByRed(){
-		if(isReadRedSuc()){
-			reviseDegByRed();
+		void reviseDeg(){
+			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/415.0))/M_PI;
+			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+		}
+		void reset(){
+			redus::redf.reset();
+			redus::redb.reset();
+		}
+		void revise(){
+			if(isReadSuc()){
+				reviseDeg();
+			}
 		}
 	}
 	
 	void resetFarw(){
 		if(mc::isBlueField()){
-			resetRed();
+			red::reset();
 		}else{
-			resetBlue();
+			blue::reset();
 		}
 	}
 	void resetHomew(){
 		if(mc::isBlueField()){
-			resetBlue();
+			blue::reset();
 		}else{
-			resetRed();
+			red::reset();
 		}
 	}
 	void reviseByFarw(){
 		if(mc::isBlueField()){
-			reviseByRed();
+			red::revise();
 		}else{
-			reviseByBlue();
+			blue::revise();
 		}
 	}
 	void reviseByHomew(){
 		if(mc::isBlueField()){
-			reviseByBlue();
+			blue::revise();
 		}else{
-			reviseByRed();
+			red::revise();
 		}
 	}
 	
