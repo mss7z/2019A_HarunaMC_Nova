@@ -37,7 +37,7 @@ namespace player{
 			isTimerRun=false;
 			return true;
 		}else{
-			if(distSq(val)>SQ(500)){
+			if(distSq(val)>SQ(400)){
 				if(isTimerRun){
 					t.stop();
 					isTimerRun=false;
@@ -63,9 +63,17 @@ namespace auco{
 	void procCmdnow();
 	statusCmd readCmdsts();
 	
+	void procTowel1();
+	void procTowel2();
 	void procSheets();
-	void procSheetsBom();
+	void procSheetsSet();
 	void procWalker();
+	
+	void setCoord(coordFunc f, int t){
+		pointc startp=f(t);
+		sensor::setX(startp.x);
+		sensor::setY(startp.y);
+	}
 	
 	void setup(){
 		
@@ -112,17 +120,21 @@ namespace auco{
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
-			player::set(coord::towel1);
 			break;
 			
 			case TOWEL2:
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
-			player::set(coord::towel2);
 			break;
 			
 			case SHEETS:
+			mc::setIsiStop(false);
+			pid::turnX(true);
+			pid::turnY(true);
+			break;
+			
+			case SHEETS_SET:
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
@@ -132,6 +144,7 @@ namespace auco{
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
+			player::set(coord::sheetsBom);
 			break;
 			
 			case GOBACK:
@@ -168,36 +181,39 @@ namespace auco{
 				break;
 				
 				case TOWEL1:
-				if(player::isPlayEnd()){
-					cmdsts=MOVED;
-				}
+				procTowel1();
 				break;
 				
 				case TOWEL2:
-				if(player::isPlayEnd()){
-					cmdsts=MOVED;
-				}
+				procTowel2();
 				break;
 				
 				case SHEETS:
 				procSheets();
 				break;
 				
+				case SHEETS_SET:
+				procSheetsSet();
+				break;
+				
 				case SHEETS_BOM:
-				procSheetsBom();
+				if(player::isPlayEnd()){
+					cmdsts=MOVED;
+				}
 				break;
 				
 				case GOBACK:
 				if(player::isPlayEnd()){
 					cmdsts=MOVED;
 				}
+				break;
 				
 				case WALKER:
 				procWalker();
 				break;
 				
 				default:
-				pc.printf("FATAL ERR in mautoCore procCmdnow default called!!\n");
+				pc.printf("FATAL ERR in mautoCore procCmdnow : default was called!!\n");
 				break;
 			}
 		}
@@ -215,6 +231,65 @@ namespace auco{
 			//cmdsts=MOVED;
 		}
 	}
+	
+	void procTowel1(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			player::set(coord::towel1);
+			setCoord(coord::towel1,0);
+			cont++;
+			//意図的にbreakなし
+			case 1:
+			if(player::isPlayEnd()){
+				cont++;
+			}
+			break;
+			
+			case 2:
+			time.reset();
+			time.start();
+			cont++;
+			//ib
+			
+			case 3:
+			if(time.read_ms()>3000){
+				cont=0;
+				cmdsts=MOVED;
+			}
+			break;
+		}
+	}
+	void procTowel2(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			player::set(coord::towel2);
+			cont++;
+			//意図的にbreakなし
+			case 1:
+			if(player::isPlayEnd()){
+				cont++;
+			}
+			break;
+			
+			case 2:
+			time.reset();
+			time.start();
+			cont++;
+			//ib
+			
+			case 3:
+			if(time.read_ms()>3000){
+				cont=0;
+				cmdsts=MOVED;
+			}
+			break;
+		}
+	}
+			
 	void procSheets(){
 		static int cont=0;
 		static Timer time;
@@ -226,11 +301,7 @@ namespace auco{
 			
 			case 1:
 			if(player::isPlayEnd()){
-				if(mc::isBlueField()){
-					//sensor::resetRed();
-				}else{
-				//	sensor::resetBlue();
-				}
+				sensor::resetFarw();
 				cont++;
 				time.reset();
 				time.start();
@@ -238,14 +309,17 @@ namespace auco{
 			break;
 			
 			case 2:
-			/*if(mc::isBlueField()){
-				if(sensor::isReadRedSuc()){
-				}
-			}*/
+			sensor::reviseByFarw();
+			if(time.read_ms()>3000){
+				cont++;
+				time.stop();
+			}
+			break;
 			
 			case 3:
 			player::set(coord::sheetsExtendPoll);
 			cont++;
+			//意図的にbreakなし
 			
 			case 4:
 			if(player::isPlayEnd()){
@@ -255,7 +329,7 @@ namespace auco{
 			break;
 		}
 	}
-	void procSheetsBom(){
+	/*void procSheetsBom(){
 		static int cont=0;
 		switch(cont){
 			case 0:
@@ -273,6 +347,34 @@ namespace auco{
 			if(player::isPlayEnd()){
 				cmdsts=MOVED;
 				cont=0;
+			}
+			break;
+		}
+	}*/
+	void procSheetsSet(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			player::set(coord::sheetsSet);
+			cont++;
+			//意図的にbreakなし
+			case 1:
+			if(player::isPlayEnd()){
+				cont++;
+			}
+			break;
+			
+			case 2:
+			time.reset();
+			time.start();
+			cont++;
+			//ib
+			
+			case 3:
+			if(time.read_ms()>3000){
+				cont=0;
+				cmdsts=MOVED;
 			}
 			break;
 		}

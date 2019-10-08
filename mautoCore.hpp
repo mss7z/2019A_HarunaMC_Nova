@@ -20,6 +20,7 @@ namespace auco{
 		TOWEL1,
 		TOWEL2,
 		SHEETS,
+		SHEETS_SET,
 		SHEETS_BOM,
 		GOBACK,
 		WALKER,

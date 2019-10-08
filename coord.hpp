@@ -24,8 +24,8 @@ namespace coord{
 	
 	pointc sheetsReadWall(int);
 	pointc sheetsExtendPoll(int);
-	pointc sheetsBomStarting(int);
-	pointc sheetsBomRunning(int);
+	pointc sheetsSet(int);
+	pointc sheetsBom(int);
 	
 	pointc goback(int);
 };

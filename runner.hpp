@@ -79,8 +79,10 @@ namespace sensor{
 
 namespace motor{
 	void setup();
+	void loop();
 	
 	extern bool isStop;
+	extern bool isRunning;
 	class aMt:aMotorPwm{
 		//汚いコンストラクタ
 		//継承コンストラクタを使いたい。いい方法あったら教えてください。
@@ -100,6 +102,9 @@ namespace motor{
 				reversalMultArg
 			){};
 			void set(float val){
+				if(val>0.1 || val<-0.1){
+					isRunning=true;
+				}
 				if(isStop){
 					aMotorPwm::set(0.0);
 				}else{
@@ -116,6 +121,7 @@ namespace motor{
 	
 	void on(bool);
 	void emergStopIs(bool);
+	inline bool isOut(){return isRunning;}
 }
 namespace mt=motor;
 

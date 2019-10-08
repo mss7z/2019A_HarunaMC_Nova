@@ -57,6 +57,7 @@ namespace mylib{
 		public:
 		trueFalse(bool start=true):is(!start){}
 		bool get(){is=!is;return is;}
+		operator bool(){return get();}
 	};
 	
 	template <typename T>

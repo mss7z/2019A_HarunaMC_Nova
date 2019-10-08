@@ -56,7 +56,7 @@ namespace sensor{
 		static const double mmPerREcont=0.3098641192;//1回転1024パルス、円周101Pi、(101Pi)/1024
 		//書いてて気が付いたけど、これって線形変換の回転移動？
 		const double dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
-		const double r=rad();
+		const double r=0;//rad();
 		xv+=(dxv*cos(r)-dyv*sin(r))*mmPerREcont;
 		yv+=(dxv*sin(r)+dyv*cos(r))*mmPerREcont;
 	}
@@ -170,14 +170,20 @@ namespace sensor{
 			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/415.0))/M_PI;
 			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
 		}
+		int readMM(){
+			return (redus::blueb.readMM()+redus::bluef.readMM())/2;
+		}
 		void reset(){
 			redus::bluef.reset();
 			redus::blueb.reset();
 		}
-		void revise(){
+		int revise(){
+			int mm=0;
 			if(isReadSuc()){
 				reviseDeg();
+				mm=readMM();
 			}
+			return mm;
 		}
 	}
 	
@@ -214,10 +220,16 @@ namespace sensor{
 			redus::redf.reset();
 			redus::redb.reset();
 		}
-		void revise(){
+		int readMM(){
+			return (redus::redb.readMM()+redus::redf.readMM())/2;
+		}
+		int revise(){
+			int mm=0;
 			if(isReadSuc()){
 				reviseDeg();
+				mm=readMM();
 			}
+			return mm;
 		}
 	}
 	
@@ -236,10 +248,17 @@ namespace sensor{
 		}
 	}
 	void reviseByFarw(){
+		int mm;
 		if(mc::isBlueField()){
-			red::revise();
+			mm=red::revise();
+			if( mm != 0){
+				setX(5600-mm-375);
+			}
 		}else{
-			blue::revise();
+			mm=blue::revise();
+			if( mm != 0){
+				setX(-5600+mm+375);
+			}
 		}
 	}
 	void reviseByHomew(){
@@ -278,10 +297,14 @@ namespace sensor{
 namespace motor{
 	
 	bool isStop=false;
+	bool isRunning=false;
 	DigitalOut mton(PC_4);
 	
 	void setup(){
 		on(true);
+	}
+	void loop(){
+		isRunning=false;
 	}
 	
 	enum{
@@ -327,17 +350,24 @@ namespace mc{
 	}
 	void loop(){
 		static mylib::regularC fieldTime(100);
+		static mylib::trueFalse isVal(true);
 		if(fieldTime){
 			isBlueFieldVal=fieldSw;
 			//pc.printf("hey!\n");
-			if(isBlueFieldVal){
-				tl=aTapeLEDlib::BLUE*1.0;
+			if(isVal){
+				if(isBlueFieldVal){
+					tl=aTapeLEDlib::BLUE*1.0;
+				}else{
+					tl=aTapeLEDlib::RED*1.0;
+				}
 			}else{
-				tl=aTapeLEDlib::RED*1.0;
+				if(mt::isOut()){
+					tl=0x0000FFFF;
+				}
 			}
 			//tl=0xff;
 		}
-		
+		mt::loop();
 		pid::loop();
 		//outLoopは最後に呼ばれなければならない
 		out::loop();
@@ -468,8 +498,8 @@ namespace pid{
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
-	aPid<float> pidX(0.00002,0.00002,0.00000,deltaT);
-	aPid<float> pidY(0.00002,0.00002,0.00000,deltaT);
+	aPid<float> pidX(0.00008,0.00004,0.00000,deltaT);
+	aPid<float> pidY(0.00008,0.00004,0.00000,deltaT);
 	
 	void pactR();
 	void pactX();
