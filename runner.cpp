@@ -35,15 +35,19 @@ namespace sensor{
 
 	aAeGyroSmd gyro(PC_5,1.0);
 	
-	aRotaryEncoder yenc(A5,A4,PullDown,false);
-	aRotaryEncoder xenc(A2,A3,PullDown);
+	aRotaryEncoder yenc(A5,A4,PullDown,true);
+	aRotaryEncoder xenc(A2,A3,PullDown,false);
 	
 	namespace redus{
 		const int TIMEOUT=5*1000;//us?
-		aRedUS bluef(PC_3,TIMEOUT);
+		/*aRedUS bluef(PC_3,TIMEOUT);
 		aRedUS blueb(PC_2,TIMEOUT);
 		aRedUS redf(PA_15,TIMEOUT);
-		aRedUS redb(PH_1,TIMEOUT);
+		aRedUS redb(PH_1,TIMEOUT);*/
+		aRedUS bluef(PH_1,TIMEOUT);
+		aRedUS blueb(PA_15,TIMEOUT);
+		aRedUS redf(PC_2,TIMEOUT);
+		aRedUS redb(PC_3,TIMEOUT);
 		aRedUS front(PB_13,TIMEOUT);
 		aRedUS back(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
@@ -146,7 +150,7 @@ namespace sensor{
 			static mylib::regularC rvs(readRedUSinterval);//rvs=revise
 			//時間を制限するためのregularC
 			static mylib::trueFalse witch(true);
-			static bool isNotTimeoutF=true,isNotTimeoutB=true;
+			static bool isNotTimeoutF=false,isNotTimeoutB=false;
 			if(rvs.ist()){
 				if(witch.get()){
 					if(redus::bluef.update()==aRedUS::TIMEOUT){
@@ -192,7 +196,7 @@ namespace sensor{
 			static mylib::regularC rvs(readRedUSinterval);//rvs=revise
 			//時間を制限するためのregularC
 			static mylib::trueFalse witch(true);
-			static bool isNotTimeoutF=true,isNotTimeoutB=true;
+			static bool isNotTimeoutF=false,isNotTimeoutB=false;
 			if(rvs.ist()){
 				if(witch.get()){
 					if(redus::redf.update()==aRedUS::TIMEOUT){
@@ -320,10 +324,10 @@ namespace motor{
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
 	
-	aMt &q1=m2;
-	aMt &q2=m4;
-	aMt &q3=m3;
-	aMt &q4=m1;
+	aMt &q1=m3;//m2;
+	aMt &q2=m1;//m4;
+	aMt &q3=m2;//m3;
+	aMt &q4=m4;//m1;
 	
 	aMt *q[MTDS]={&q1,&q2,&q3,&q4};
 	float o[MTDS];
