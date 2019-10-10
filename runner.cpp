@@ -48,8 +48,8 @@ namespace sensor{
 		aRedUS blueb(PC_3,TIMEOUT);
 		aRedUS redf(PH_1,TIMEOUT);
 		aRedUS redb(PC_2,TIMEOUT);
-		aRedUS front(PB_13,TIMEOUT);
-		aRedUS back(PB_14,TIMEOUT);
+		aRedUS blues(PB_13,TIMEOUT);
+		aRedUS reds(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
 	}
 	aRedUS *fp=NULL,*bp=NULL;
@@ -238,6 +238,60 @@ namespace sensor{
 			return mm;
 		}
 	}
+	namespace bluePole{
+		bool isReadSuc(){
+			static mylib::regularC rvs(60);
+			if(rvs){
+				if(redus::blues.update()==aRedUS::TIMEOUT){
+					redus::blues.reset();
+					return false;
+				}else{
+					return true;
+				}
+			}
+			return false;
+		}
+		void reset(){
+			redus::blues.reset();
+		}
+		int readMM(){
+			return (redus::blues.readMM());
+		}
+		int revise(){
+			int mm=0;
+			if(isReadSuc()){
+				mm=readMM();
+			}
+			return mm;
+		}
+	}
+	namespace redPole{
+		bool isReadSuc(){
+			static mylib::regularC rvs(60);
+			if(rvs){
+				if(redus::reds.update()==aRedUS::TIMEOUT){
+					redus::reds.reset();
+					return false;
+				}else{
+					return true;
+				}
+			}
+			return false;
+		}
+		void reset(){
+			redus::reds.reset();
+		}
+		int readMM(){
+			return (redus::reds.readMM());
+		}
+		int revise(){
+			int mm=0;
+			if(isReadSuc()){
+				mm=readMM();
+			}
+			return mm;
+		}
+	}
 	
 	void resetFarw(){
 		if(mc::isBlueField()){
@@ -281,7 +335,48 @@ namespace sensor{
 			}
 		}
 	}
-	
+	void resetFarPole(){
+		if(mc::isBlueField()){
+			redPole::reset();
+		}else{
+			bluePole::reset();
+		}
+	}
+	void resetHomePole(){
+		if(mc::isBlueField()){
+			bluePole::reset();
+		}else{
+			redPole::reset();
+		}
+	}
+	void reviseByFarPole(){
+		int mm;
+		if(mc::isBlueField()){
+			mm=redPole::revise();
+			if(mm != 0){
+				setX(-4550+mm+375);
+			}
+		}else{
+			mm=bluePole::revise();
+			if(mm != 0){
+				setX(+4550-mm-375);
+			}
+		}
+	}
+	void reviseByHomePole(){
+		int mm;
+		if(mc::isBlueField()){
+			mm=bluePole::revise();
+			if(mm != 0){
+				setX(-1750-mm-375);
+			}
+		}else{
+			mm=redPole::revise();
+			if(mm != 0){
+				setX(+1750+mm+375);
+			}
+		}
+	}
 	
 	/*
 	//超音波距離計による角度算出とジャイロの補正

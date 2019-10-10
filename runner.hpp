@@ -75,6 +75,11 @@ namespace sensor{
 	void resetHomew();
 	void reviseByFarw();
 	void reviseByHomew();
+	
+	void resetFarPole();
+	void resetHomePole();
+	void reviseByFarPole();
+	void reviseByHomePole();
 }
 
 namespace motor{
