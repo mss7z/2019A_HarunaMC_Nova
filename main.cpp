@@ -84,17 +84,13 @@ int main(){
 	return 0;*/
 	/*mylib::regularC time(500);
 	while(true){
-		sensor::isReadRedSuc();
+		sensor::reviseByHomew();
 		if(time){
-			if(sensor::isReadRedSuc()){
-				pc.printf("ok  ");
-				sensor::reviseDegByRed();
-			}else{
-				pc.printf("    ");
-			}
+			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
 			pc.printf("%10sdeg\n",flt(sensor::deg()));
 		}
 	}*/
+	//2530 2390
 	
 	while (true){
 		monitor::loop();

@@ -9,6 +9,7 @@ namespace player{
 	
 	void set(coordFunc);
 	bool isPlayEnd();
+	pointc readFunc(coordFunc,int);
 	
 	void loop(){
 		if(mc::isBlueField()){
@@ -32,7 +33,7 @@ namespace player{
 	}
 	bool isPlayEnd(){
 		pointc val;
-		if(( val=nowf(t.read_ms()) ) ==coord::ENDCOORD){
+		if(( val=readFunc(nowf,t.read_ms()) ) ==coord::ENDCOORD){
 			t.stop();
 			isTimerRun=false;
 			return true;
@@ -48,9 +49,18 @@ namespace player{
 					isTimerRun=true;
 				}
 			}
-			pid::psetX(xMult*val.x);
+			pid::psetX(val.x);
 			pid::psetY(val.y);
 			return false;
+		}
+	}
+	pointc readFunc(coordFunc f,int t){
+		pointc val=f(t);
+		if(val==coord::ENDCOORD){
+			return coord::ENDCOORD;
+		}else{
+			val.x*=xMult;
+			return val;
 		}
 	}
 };
@@ -63,17 +73,13 @@ namespace auco{
 	void procCmdnow();
 	statusCmd readCmdsts();
 	
+	void setCoord(coordFunc f, int t);
 	void procTowel1();
 	void procTowel2();
 	void procSheets();
 	void procSheetsSet();
 	void procWalker();
 	
-	void setCoord(coordFunc f, int t){
-		pointc startp=f(t);
-		sensor::setX(startp.x);
-		sensor::setY(startp.y);
-	}
 	
 	void setup(){
 		
@@ -87,6 +93,12 @@ namespace auco{
 		}
 		procCmdnow();
 		player::loop();
+	}
+	
+	void setCoord(coordFunc f, int t){
+		pointc startp=player::readFunc(f,t);
+		sensor::setX(startp.x);
+		sensor::setY(startp.y);
 	}
 	
 	//cmdを切り替えるときに呼ぶ　初期化などをする
@@ -107,14 +119,14 @@ namespace auco{
 			break;
 			
 			case OTSK:{
-			mc::setIsiStop(false);
+			/*mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
 			player::set(coord::otsk);
 			pointc startp=coord::otsk(0);
 			sensor::setX(startp.x);
 			sensor::setY(startp.y);
-			break;
+			*/break;
 			}
 			case TOWEL1:
 			mc::setIsiStop(false);
@@ -242,6 +254,9 @@ namespace auco{
 			cont++;
 			//意図的にbreakなし
 			case 1:
+			if(-1000<sensor::x() && sensor::x()<1000){
+				sensor::reviseByHomew();
+			}
 			if(player::isPlayEnd()){
 				cont++;
 			}

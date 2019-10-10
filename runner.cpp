@@ -44,10 +44,10 @@ namespace sensor{
 		aRedUS blueb(PC_2,TIMEOUT);
 		aRedUS redf(PA_15,TIMEOUT);
 		aRedUS redb(PH_1,TIMEOUT);*/
-		aRedUS bluef(PH_1,TIMEOUT);
-		aRedUS blueb(PA_15,TIMEOUT);
-		aRedUS redf(PC_2,TIMEOUT);
-		aRedUS redb(PC_3,TIMEOUT);
+		aRedUS bluef(PA_15,TIMEOUT);
+		aRedUS blueb(PC_3,TIMEOUT);
+		aRedUS redf(PH_1,TIMEOUT);
+		aRedUS redb(PC_2,TIMEOUT);
 		aRedUS front(PB_13,TIMEOUT);
 		aRedUS back(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
@@ -166,9 +166,10 @@ namespace sensor{
 					}else{
 						isNotTimeoutB=true;
 					}
+					return isNotTimeoutF && isNotTimeoutB;
 				}
 			}
-			return isNotTimeoutF && isNotTimeoutB;
+			return false;
 		}
 		void reviseDeg(){
 			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/415.0))/M_PI;
@@ -213,8 +214,9 @@ namespace sensor{
 						isNotTimeoutB=true;
 					}
 				}
+				return isNotTimeoutF && isNotTimeoutB;
 			}
-			return isNotTimeoutF && isNotTimeoutB;
+			return false;
 		}
 		void reviseDeg(){
 			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/415.0))/M_PI;
@@ -266,10 +268,17 @@ namespace sensor{
 		}
 	}
 	void reviseByHomew(){
+		int mm;
 		if(mc::isBlueField()){
-			blue::revise();
+			mm=blue::revise();
+			if( mm != 0){
+				setX((-mm-375)*0.2+x()*0.8);
+			}
 		}else{
-			red::revise();
+			mm=red::revise();
+			if( mm != 0){
+				setX((mm+375)*0.2+x()*0.8);
+			}
 		}
 	}
 	
