@@ -58,7 +58,7 @@ namespace sensor{
 	namespace redus{
 		extern aRedUS bluef,blueb,redf,redb;
 	}
-	extern aRedUS *fp,*bp;
+	//extern aRedUS *fp,*bp;
 	
 	inline float deg(){return gyro.getDeg();}
 	inline float rad(){return (M_PI*(deg()))/180.0;}

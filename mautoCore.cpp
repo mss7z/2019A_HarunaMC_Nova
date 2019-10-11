@@ -74,6 +74,7 @@ namespace auco{
 	statusCmd readCmdsts();
 	
 	void setCoord(coordFunc f, int t);
+	void procOtsk();
 	void procTowel1();
 	void procTowel2();
 	void procSheets();
@@ -100,6 +101,11 @@ namespace auco{
 		sensor::setX(startp.x);
 		sensor::setY(startp.y);
 	}
+	void setPid(coordFunc f, int t){
+		pointc startp=player::readFunc(f,t);
+		pid::psetX(startp.x);
+		pid::psetY(startp.y);
+	}
 	
 	//cmdを切り替えるときに呼ぶ　初期化などをする
 	void turnCmd(parentCmd cmd){//setupてきな
@@ -118,16 +124,14 @@ namespace auco{
 			cmdsts=MOVED;
 			break;
 			
-			case OTSK:{
-			/*mc::setIsiStop(false);
+			case OTSK:
+			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
-			player::set(coord::otsk);
-			pointc startp=coord::otsk(0);
-			sensor::setX(startp.x);
-			sensor::setY(startp.y);
-			*/break;
-			}
+			//player::set(coord::otsk);
+			//setCoord(coord::otsk,0);
+			break;
+			
 			case TOWEL1:
 			mc::setIsiStop(false);
 			pid::turnX(true);
@@ -187,9 +191,10 @@ namespace auco{
 				break;
 				
 				case OTSK:
-				if(player::isPlayEnd()){
+				/*if(player::isPlayEnd()){
 					cmdsts=MOVED;
-				}
+				}*/
+				procOtsk();
 				break;
 				
 				case TOWEL1:
@@ -244,6 +249,50 @@ namespace auco{
 		}
 	}
 	
+	void procOtsk(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			setPid(coord::otsk,0);
+			setCoord(coord::otsk,0);
+			sensor::resetHomew();
+			time.reset();
+			time.start();
+			cont++;
+			
+			case 1:
+			sensor::reviseByHomew();
+			if(time.read_ms()>3000){
+				cont++;
+				player::set(coord::otsk);
+			}
+			break;
+			
+			//意図的にbreakなし
+			case 2:
+			if(player::isPlayEnd()){
+				cont++;
+			}
+			break;
+			
+			case 3:
+			sensor::resetHomew();
+			time.reset();
+			time.start();
+			cont++;
+			//ib
+			
+			case 4:
+			sensor::reviseByHomew();
+			if(time.read_ms()>150000){
+				cont=0;
+				cmdsts=MOVED;
+			}
+			break;
+		}
+	}
+	
 	void procTowel1(){
 		static int cont=0;
 		static Timer time;
@@ -251,6 +300,7 @@ namespace auco{
 			case 0:
 			player::set(coord::towel1);
 			setCoord(coord::towel1,0);
+			sensor::resetHomew();
 			cont++;
 			//意図的にbreakなし
 			case 1:

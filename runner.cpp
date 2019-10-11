@@ -23,13 +23,13 @@ namespace sensor{
 		//reviseGyroOwn();
 		//reviseByRedUS();
 		
-		if(mc::isBlueField()){
+		/*if(mc::isBlueField()){
 			fp=&redus::bluef;
 			bp=&redus::blueb;
 		}else{
 			fp=&redus::redf;
 			bp=&redus::redb;
-		}
+		}*/
 			
 	}
 
@@ -52,7 +52,7 @@ namespace sensor{
 		aRedUS reds(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
 	}
-	aRedUS *fp=NULL,*bp=NULL;
+	//aRedUS *fp=NULL,*bp=NULL;
 	
 	void calcXY(){
 		//エンコーダ1カウント当たり何ミリメートルか？
@@ -60,7 +60,7 @@ namespace sensor{
 		static const double mmPerREcont=0.3098641192;//1回転1024パルス、円周101Pi、(101Pi)/1024
 		//書いてて気が付いたけど、これって線形変換の回転移動？
 		const double dxv=dx.f(xenc.readRaw()), dyv=dy.f(yenc.readRaw());
-		const double r=0;//rad();
+		const double r=rad();
 		xv+=(dxv*cos(r)-dyv*sin(r))*mmPerREcont;
 		yv+=(dxv*sin(r)+dyv*cos(r))*mmPerREcont;
 	}
@@ -326,12 +326,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=blue::revise();
 			if( mm != 0){
-				setX((-mm-375)*0.2+x()*0.8);
+				setX((-mm-375)*0.5+x()*0.5);
 			}
 		}else{
 			mm=red::revise();
 			if( mm != 0){
-				setX((mm+375)*0.2+x()*0.8);
+				setX((mm+375)*0.5+x()*0.5);
 			}
 		}
 	}
