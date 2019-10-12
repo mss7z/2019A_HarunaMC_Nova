@@ -48,8 +48,10 @@ namespace sensor{
 		aRedUS blueb(PC_3,TIMEOUT);
 		aRedUS redf(PH_1,TIMEOUT);
 		aRedUS redb(PC_2,TIMEOUT);
-		aRedUS blues(PB_13,TIMEOUT);
-		aRedUS reds(PB_14,TIMEOUT);
+		//aRedUS blues(PB_13,TIMEOUT);
+		//aRedUS reds(PB_14,TIMEOUT);
+		aRedUS &blues=blueb;
+		aRedUS &reds=redb;
 		//aRedUSはプルダウン
 	}
 	//aRedUS *fp=NULL,*bp=NULL;
@@ -172,7 +174,7 @@ namespace sensor{
 			return false;
 		}
 		void reviseDeg(){
-			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/415.0))/M_PI;
+			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/200.0))/M_PI;
 			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
 		}
 		int readMM(){
@@ -219,7 +221,7 @@ namespace sensor{
 			return false;
 		}
 		void reviseDeg(){
-			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/415.0))/M_PI;
+			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/200.0))/M_PI;
 			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
 		}
 		void reset(){

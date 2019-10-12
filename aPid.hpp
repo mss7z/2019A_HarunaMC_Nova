@@ -20,11 +20,20 @@ namespace __aPid_internal__{
 			preVal=0;
 		}
 	};
+	
+	struct pidGain{
+		float p;
+		float i;
+		float d;
+		/*pidGain(float pa,float ia,float da):
+		p(pa),i(ia),d(da)
+		{}*/
+	};
 
 	template <typename T>
 	class aPid{
 	private:
-		const float KP,KI,KD;
+		float KP,KI,KD;
 		const T DT;
 		T target;
 		T preOpe;
@@ -32,11 +41,26 @@ namespace __aPid_internal__{
 		delta<T> dd1,dd2;
 	public:
 		aPid(float kPArg,float kIArg,float kDArg,float dtArg);
+		aPid(pidGain gain,float dtArg);
 		T calc(T val);
 		void set(T val){target=val;}
 		T read(){return target;}
 		void reset();
+		void setGain(float kPArg,float kIArg,float kDArg);
+		void setGain(pidGain arg);
 	};
+	
+	template<typename T>
+	void aPid<T>::setGain(float kPArg,float kIArg,float kDArg){
+		KP=kPArg;
+		KI=kIArg;
+		KD=kDArg;
+	}
+	
+	template<typename T>
+	void aPid<T>::setGain(pidGain arg){
+		setGain(arg.p, arg.i, arg.d);
+	}
 	
 	template<typename T>
 	void aPid<T>::reset(){
@@ -46,13 +70,20 @@ namespace __aPid_internal__{
 		dd1.reset();
 		dd2.reset();
 	}
-		
 	
 	template<typename T>
 	aPid<T>::aPid(float kPArg,float kIArg,float kDArg,float dtArg):
 	KP(kPArg),KI(kIArg),KD(kDArg),DT(dtArg),
 	dp(DT),dd1(DT),dd2(DT)
 	{
+		reset();
+	}
+	
+	template<typename T>
+	aPid<T>::aPid(pidGain gain,float dtArg):
+	DT(dtArg),dp(DT),dd1(DT),dd2(DT)
+	{
+		setGain(gain,dtArg);
 		reset();
 	}
 
@@ -72,5 +103,6 @@ namespace __aPid_internal__{
 	}
 }
 using __aPid_internal__::aPid;
+using __aPid_internal__::pidGain;
 
 #endif

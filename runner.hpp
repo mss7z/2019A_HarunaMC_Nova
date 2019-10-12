@@ -57,6 +57,7 @@ namespace sensor{
 	
 	namespace redus{
 		extern aRedUS bluef,blueb,redf,redb;
+		extern aRedUS &blues,&reds;
 	}
 	//extern aRedUS *fp,*bp;
 	

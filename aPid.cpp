@@ -1,5 +1,5 @@
 #include "aPid.hpp"
 
 namespace __aPid_internal__{
-	//”ß‚µ‚¢¢ŠE
+	//æ‚²ã—ã„ä¸–ç•Œ
 }
