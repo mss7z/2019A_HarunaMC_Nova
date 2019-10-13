@@ -5,6 +5,7 @@
 
 #include "aMotor.hpp"
 #include "aAeGyroSmd.hpp"
+#include "aGyro_imu03a.hpp"
 #include "aPid.hpp"
 #include "aRotaryEncoder.hpp"
 #include "aRedUS.hpp"
@@ -51,7 +52,8 @@ namespace sensor{
 	void setup();
 	void loop();
 	
-	extern aAeGyroSmd gyro;
+	//extern aAeGyroSmd gyro;
+	extern a_imu03a gyro;
 	extern aRotaryEncoder xenc;
 	extern aRotaryEncoder yenc;
 	

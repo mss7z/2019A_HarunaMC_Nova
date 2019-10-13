@@ -33,7 +33,8 @@ namespace sensor{
 			
 	}
 
-	aAeGyroSmd gyro(PC_5,1.0);
+	//aAeGyroSmd gyro(PC_5,1.0);
+	a_imu03a gyro(PC_12,PC_11,PC_10,PB_1);
 	
 	aRotaryEncoder yenc(A5,A4,PullDown,true);
 	aRotaryEncoder xenc(A2,A3,PullDown,false);
@@ -83,7 +84,7 @@ namespace sensor{
 	}
 
 	//ジャイロのゼロ点調整を行う
-	void reviseGyroOwn(){
+	/*void reviseGyroOwn(){
 		static mylib::regularC rt(100);
 		static int cont=0,stTime=0,stpTime=0;
 		if(rt.ist()){
@@ -125,7 +126,7 @@ namespace sensor{
 			}
 		}
 		return;
-	}
+	}*/
 	/*
 	//RedUSによるセンサー補正の管理人
 	void reviseByRedUS(){
