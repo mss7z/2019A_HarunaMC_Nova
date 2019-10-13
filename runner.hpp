@@ -81,6 +81,9 @@ namespace sensor{
 	void resetHomePole();
 	void reviseByFarPole();
 	void reviseByHomePole();
+	
+	void resetBackPole();
+	void reviseByBackPole();
 }
 
 namespace motor{
@@ -128,6 +131,8 @@ namespace motor{
 	void on(bool);
 	void emergStopIs(bool);
 	inline bool isOut(){return isRunning;}
+	
+	void fatalError();
 }
 namespace mt=motor;
 
@@ -167,6 +172,14 @@ namespace pid{
 	//XY軸の制御を有効にするか
 	void turnX(bool);
 	void turnY(bool);
+	
+	enum gainMode{
+		BY_INWORLD,
+		BY_OUTWORLD,
+		BY_HOMEW,
+	};
+	
+	void psetGain(gainMode);
 }
 
 

@@ -80,7 +80,7 @@ namespace auco{
 	void procSheets();
 	void procSheetsSet();
 	void procWalker();
-	
+	void procGoback();
 	
 	void setup(){
 		
@@ -167,7 +167,7 @@ namespace auco{
 			mc::setIsiStop(false);
 			pid::turnX(true);
 			pid::turnY(true);
-			player::set(coord::goback);
+			//player::set(coord::goback);
 			break;
 			
 			case WALKER:
@@ -220,9 +220,10 @@ namespace auco{
 				break;
 				
 				case GOBACK:
-				if(player::isPlayEnd()){
+				/*if(player::isPlayEnd()){
 					cmdsts=MOVED;
-				}
+				}*/
+				procGoback();
 				break;
 				
 				case WALKER:
@@ -278,6 +279,7 @@ namespace auco{
 			
 			case 3:
 			sensor::resetHomew();
+			pid::psetGain(pid::BY_INWORLD);
 			time.reset();
 			time.start();
 			cont++;
@@ -287,6 +289,7 @@ namespace auco{
 			sensor::reviseByHomew();
 			if(time.read_ms()>150000){
 				cont=0;
+				pid::psetGain(pid::BY_OUTWORLD);
 				cmdsts=MOVED;
 			}
 			break;
@@ -298,28 +301,37 @@ namespace auco{
 		static Timer time;
 		switch(cont){
 			case 0:
-			player::set(coord::towel1);
-			setCoord(coord::towel1,0);
+			player::set(coord::towel1ByHomew);
+			setCoord(coord::towel1ByHomew,0);
 			sensor::resetHomew();
+			pid::psetGain(pid::BY_HOMEW);
 			cont++;
 			//意図的にbreakなし
 			case 1:
-			if(-1000<sensor::x() && sensor::x()<1000){
+			//if(-1000<sensor::x() && sensor::x()<1000){
 				sensor::reviseByHomew();
-			}
+			//}
 			if(player::isPlayEnd()){
+				player::set(coord::towel1);
+				pid::psetGain(pid::BY_INWORLD);
 				cont++;
 			}
 			break;
 			
 			case 2:
-			time.reset();
-			time.start();
-			cont++;
-			//ib
-			
+			if(player::isPlayEnd()){
+				time.reset();
+				time.start();
+				sensor::resetHomePole();
+				pid::psetGain(pid::BY_OUTWORLD);
+				cont++;
+			}
+			break;
+		
 			case 3:
+			sensor::reviseByHomePole();
 			if(time.read_ms()>3000){
+				pid::psetGain(pid::BY_INWORLD);
 				cont=0;
 				cmdsts=MOVED;
 			}
@@ -344,10 +356,14 @@ namespace auco{
 			time.reset();
 			time.start();
 			cont++;
+			pid::psetGain(pid::BY_OUTWORLD);
+			sensor::resetFarPole();
 			//ib
 			
 			case 3:
+			sensor::reviseByFarPole();
 			if(time.read_ms()>3000){
+				pid::psetGain(pid::BY_INWORLD);
 				cont=0;
 				cmdsts=MOVED;
 			}
@@ -367,6 +383,8 @@ namespace auco{
 			case 1:
 			if(player::isPlayEnd()){
 				sensor::resetFarw();
+				sensor::resetBackPole();
+				pid::psetGain(pid::BY_INWORLD);
 				cont++;
 				time.reset();
 				time.start();
@@ -375,7 +393,9 @@ namespace auco{
 			
 			case 2:
 			sensor::reviseByFarw();
+			sensor::reviseByBackPole();
 			if(time.read_ms()>3000){
+				pid::psetGain(pid::BY_OUTWORLD);
 				cont++;
 				time.stop();
 			}
@@ -433,10 +453,47 @@ namespace auco{
 			case 2:
 			time.reset();
 			time.start();
+			sensor::resetFarPole();
+			pid::psetGain(pid::BY_OUTWORLD);
 			cont++;
 			//ib
 			
 			case 3:
+			sensor::reviseByFarPole();
+			if(time.read_ms()>3000){
+				pid::psetGain(pid::BY_INWORLD);
+				cont=0;
+				cmdsts=MOVED;
+			}
+			break;
+		}
+	}
+	void procGoback(){
+		static int cont=0;
+		static Timer time;
+		switch(cont){
+			case 0:
+			player::set(coord::goback);
+			cont++;
+			pid::psetGain(pid::BY_HOMEW);
+			sensor::resetHomew();
+			//意図的にbreakなし
+			case 1:
+			sensor::reviseByHomew();
+			if(player::isPlayEnd()){
+				cont++;
+			}
+			break;
+			
+			case 2:
+			time.reset();
+			time.start();
+			cont++;
+			pid::psetGain(pid::BY_OUTWORLD);
+			//ib
+			
+			case 3:
+			sensor::reviseByHomew();
 			if(time.read_ms()>3000){
 				cont=0;
 				cmdsts=MOVED;
@@ -444,6 +501,7 @@ namespace auco{
 			break;
 		}
 	}
+		
 	void procWalker(){
 		static int cont=0;
 		switch(cont){

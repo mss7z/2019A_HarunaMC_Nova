@@ -19,6 +19,7 @@ namespace coord{
 	pointc walkerGo(int);
 	pointc walkerBack(int);
 	
+	pointc towel1ByHomew(int);
 	pointc towel1(int);
 	pointc towel2(int);
 	

@@ -52,6 +52,7 @@ namespace sensor{
 		//aRedUS reds(PB_14,TIMEOUT);
 		aRedUS &blues=blueb;
 		aRedUS &reds=redb;
+		aRedUS back(PB_14,TIMEOUT);
 		//aRedUSはプルダウン
 	}
 	//aRedUS *fp=NULL,*bp=NULL;
@@ -215,8 +216,8 @@ namespace sensor{
 					}else{
 						isNotTimeoutB=true;
 					}
+					return isNotTimeoutF && isNotTimeoutB;
 				}
-				return isNotTimeoutF && isNotTimeoutB;
 			}
 			return false;
 		}
@@ -285,6 +286,33 @@ namespace sensor{
 		}
 		int readMM(){
 			return (redus::reds.readMM());
+		}
+		int revise(){
+			int mm=0;
+			if(isReadSuc()){
+				mm=readMM();
+			}
+			return mm;
+		}
+	}
+	namespace backPole{
+		bool isReadSuc(){
+			static mylib::regularC rvs(60);
+			if(rvs){
+				if(redus::back.update()==aRedUS::TIMEOUT){
+					redus::back.reset();
+					return false;
+				}else{
+					return true;
+				}
+			}
+			return false;
+		}
+		void reset(){
+			redus::back.reset();
+		}
+		int readMM(){
+			return (redus::back.readMM());
 		}
 		int revise(){
 			int mm=0;
@@ -379,7 +407,15 @@ namespace sensor{
 			}
 		}
 	}
-	
+	void resetBackPole(){
+		backPole::reset();
+	}
+	void reviseByBackPole(){
+		int mm=bluePole::revise();
+		if(mm != 0){
+			setY(7500+mm+375);
+		}
+	}
 	/*
 	//超音波距離計による角度算出とジャイロの補正
 	void reviseGyroExt(){
@@ -459,22 +495,26 @@ namespace mc{
 		mt::setup();
 	}
 	void loop(){
-		static mylib::regularC fieldTime(100);
-		static mylib::trueFalse isVal(true);
+		static mylib::regularC fieldTime(20);
+		//static mylib::trueFalse isVal(true);
 		if(fieldTime){
 			isBlueFieldVal=fieldSw;
 			//pc.printf("hey!\n");
-			if(isVal){
+			static int cont=0;
+			if(cont<12){
 				if(isBlueFieldVal){
-					tl=aTapeLEDlib::BLUE*1.0;
+					tl=0xBF1140A2;
 				}else{
-					tl=aTapeLEDlib::RED*1.0;
+					tl=0xBFFF3255;
+				}
+			}else if(cont<24){
+				if(mt::isOut()){
+					tl=0xBF3EB370;
 				}
 			}else{
-				if(mt::isOut()){
-					tl=0x0000FFFF;
-				}
+				cont=0;
 			}
+			cont++;
 			//tl=0xff;
 		}
 		mt::loop();
@@ -485,6 +525,11 @@ namespace mc{
 	
 	
 	aTapeLED tl(PA_11,PB_2,PB_6);
+	void fatalError(){
+		while(true){
+			aTapeLEDlib::colorful(tl);
+		}
+	}
 	
 	//上級が停止の意思があるかを示す（上級は止めているが下級のほうでPIDなどでマシンが動いてもよい）
 	bool isIsiStopVal;
@@ -608,8 +653,8 @@ namespace pid{
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
-	aPid<float> pidX(0.00008,0.00004,0.00000,deltaT);
-	aPid<float> pidY(0.00008,0.00004,0.00000,deltaT);
+	aPid<float> pidX(0.00008,0.00008,0.00000,deltaT);
+	aPid<float> pidY(0.00008,0.00008,0.00000,deltaT);
 	
 	void pactR();
 	void pactX();
@@ -618,6 +663,7 @@ namespace pid{
 	//outと同じ構造につまりsetとactおよびx,y,r変数にすべき?
 	
 	void setup(){
+		psetGain(BY_INWORLD);
 		psetR(sensor::deg());
 		psetX(sensor::x());
 		psetY(sensor::y());
@@ -666,5 +712,31 @@ namespace pid{
 	void pactY(){
 		out::setY(pidY.calc(sensor::y()));
 	}
+	
+	void psetGain(gainMode val){
+		switch((int)val){
+			case BY_INWORLD:
+			pidR.setGain(0.00008,0.00003,0.00005);
+			pidX.setGain(0.00008,0.00008,0.00000);
+            pidY.setGain(0.00008,0.00008,0.00000);
+			break;
+			
+			case BY_OUTWORLD:
+			pidR.setGain(0.00004,0.00000,0.00005);
+			pidX.setGain(0.00002,0.00000,0.00004);
+            pidY.setGain(0.00002,0.00000,0.00004);
+			break;
+			
+			case BY_HOMEW:
+			pidR.setGain(0.00008,0.00003,0.00005);
+			pidX.setGain(0.00003,0.00003,0.00000);
+            pidY.setGain(0.00008,0.00008,0.00000);
+			break;
+			
+			default:
+			mc::fatalError();
+			break;
+		}
+		return;
+	}
 }
-
