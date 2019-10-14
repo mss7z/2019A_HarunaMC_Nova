@@ -284,8 +284,8 @@ def genSlope(x):
 	return (math.sin((x)*(math.pi/2.0)))
 
 def genSpeed(now,total):
-	tagSpd=10
-	tagSpdH=500
+	tagSpd=5
+	tagSpdH=150
 	if total<(tagSpdH*2):
 		mult=total/(tagSpdH*2)
 		tagSpd*=mult

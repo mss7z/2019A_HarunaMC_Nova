@@ -145,6 +145,8 @@ namespace mc{
 	void setup();
 	void loop();
 	
+	void fatalError();
+	
 	void setIsiStop(bool);
 	bool isIsiStop();
 	

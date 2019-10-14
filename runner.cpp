@@ -30,11 +30,14 @@ namespace sensor{
 			fp=&redus::redf;
 			bp=&redus::redb;
 		}*/
-			
+		if(!gyro.isNormal()){
+			mc::fatalError();
+		}
 	}
 
 	//aAeGyroSmd gyro(PC_5,1.0);
-	a_imu03a gyro(PC_12,PC_11,PC_10,PB_1);
+	//mosi miso slck csPin isForward
+	a_imu03a gyro(PC_12,PC_11,PC_10,PB_1,false);
 	
 	aRotaryEncoder yenc(A5,A4,PullDown,true);
 	aRotaryEncoder xenc(A2,A3,PullDown,false);
@@ -156,20 +159,27 @@ namespace sensor{
 			static mylib::trueFalse witch(true);
 			static bool isNotTimeoutF=false,isNotTimeoutB=false;
 			if(rvs.ist()){
+				
 				if(witch.get()){
+					
 					if(redus::bluef.update()==aRedUS::TIMEOUT){
 						redus::bluef.reset();
 						isNotTimeoutF=false;
 					}else{
 						isNotTimeoutF=true;
+						//pc.printf("suc ");
 					}
+					//pc.printf("bluef\n");
 				}else{
+					
 					if(redus::blueb.update()==aRedUS::TIMEOUT){
 						redus::blueb.reset();
 						isNotTimeoutB=false;
 					}else{
 						isNotTimeoutB=true;
+						//pc.printf("suc ");
 					}
+					//pc.printf("blueb\n");
 					return isNotTimeoutF && isNotTimeoutB;
 				}
 			}
@@ -343,12 +353,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=red::revise();
 			if( mm != 0){
-				setX(5600-mm-375);
+				setX((5600-mm-340)*0.5 + x()*0.5);
 			}
 		}else{
 			mm=blue::revise();
 			if( mm != 0){
-				setX(-5600+mm+375);
+				setX((-5600+mm+340)*0.5 + x()*0.5);
 			}
 		}
 	}
@@ -357,12 +367,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=blue::revise();
 			if( mm != 0){
-				setX((-mm-375)*0.5+x()*0.5);
+				setX((-mm-340)*0.8+x()*0.2);
 			}
 		}else{
 			mm=red::revise();
 			if( mm != 0){
-				setX((mm+375)*0.5+x()*0.5);
+				setX((mm+340)*0.8+x()*0.2);
 			}
 		}
 	}
@@ -385,12 +395,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=redPole::revise();
 			if(mm != 0){
-				setX(-4550+mm+375);
+				setX(-4550+mm+340);
 			}
 		}else{
 			mm=bluePole::revise();
 			if(mm != 0){
-				setX(+4550-mm-375);
+				setX(+4550-mm-340);
 			}
 		}
 	}
@@ -399,12 +409,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=bluePole::revise();
 			if(mm != 0){
-				setX(-1750-mm-375);
+				setX(-1750-mm-340);
 			}
 		}else{
 			mm=redPole::revise();
 			if(mm != 0){
-				setX(+1750+mm+375);
+				setX(+1750+mm+340);
 			}
 		}
 	}
@@ -412,9 +422,9 @@ namespace sensor{
 		backPole::reset();
 	}
 	void reviseByBackPole(){
-		int mm=bluePole::revise();
+		int mm=backPole::revise();
 		if(mm != 0){
-			setY(7500+mm+375);
+			setY(6700+mm+340);
 		}
 	}
 	/*
@@ -488,7 +498,7 @@ namespace mt=motor;
 //move control
 namespace mc{
 	DigitalIn fieldSw(PB_15);
-	bool isBlueFieldVal=true;
+	bool isBlueFieldVal=false;
 	
 	void setup(){
 		pid::setup();
@@ -716,22 +726,40 @@ namespace pid{
 	
 	void psetGain(gainMode val){
 		switch((int)val){
-			case BY_INWORLD:
+			/*case BY_INWORLD:
 			pidR.setGain(0.00008,0.00003,0.00005);
-			pidX.setGain(0.00008,0.00008,0.00000);
-            pidY.setGain(0.00008,0.00008,0.00000);
+			pidX.setGain(0.00006,0.00008,0.00000);
+            pidY.setGain(0.00006,0.00008,0.00000);
 			break;
 			
 			case BY_OUTWORLD:
-			pidR.setGain(0.00004,0.00000,0.00005);
-			pidX.setGain(0.00002,0.00000,0.00004);
-            pidY.setGain(0.00002,0.00000,0.00004);
+			pidR.setGain(0.00002,0.00000,0.00005);
+			pidX.setGain(0.00001,0.00000,0.00004);
+            pidY.setGain(0.00001,0.00000,0.00004);
 			break;
 			
 			case BY_HOMEW:
 			pidR.setGain(0.00008,0.00003,0.00005);
-			pidX.setGain(0.00003,0.00003,0.00000);
+			pidX.setGain(0.000028,0.00003,0.00000);
             pidY.setGain(0.00008,0.00008,0.00000);
+			break;*/
+			
+			case BY_INWORLD:
+			pidR.setGain(0.00008,0.00003,0.00005);
+			pidX.setGain(0.00006,0.00008,0.000002);
+            pidY.setGain(0.00006,0.00008,0.000002);
+			break;
+			
+			case BY_OUTWORLD:
+			pidR.setGain(0.00002,0.00000,0.00005);
+			pidX.setGain(0.00001,0.000008,0.00002);
+            pidY.setGain(0.00001,0.000008,0.00002);
+			break;
+			
+			case BY_HOMEW:
+			pidR.setGain(0.00008,0.00003,0.00005);
+			pidX.setGain(0.000032,0.000032,0.0000);
+            pidY.setGain(0.00008,0.00008,0.000001);
 			break;
 			
 			default:

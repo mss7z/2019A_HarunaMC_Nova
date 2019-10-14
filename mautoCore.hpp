@@ -16,14 +16,14 @@ namespace auco{
 	
 	enum parentCmd{
 		STOP=0,
-		OTSK=1,
 		TOWEL1,
 		TOWEL2,
 		SHEETS,
 		SHEETS_SET,
 		SHEETS_BOM,
 		GOBACK,
-		WALKER,
+		WALKER=7,
+		OTSK=8,
 	};
 	enum statusCmd{
 		EMERG=1,

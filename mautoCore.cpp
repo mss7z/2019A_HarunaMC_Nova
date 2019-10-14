@@ -246,6 +246,9 @@ namespace auco{
 			cmdsts=EMERG;
 		}else{
 			isEmerg=is;
+			if(cmdnow==STOP){
+				cmdsts=MOVED;
+			}
 			//cmdsts=MOVED;
 		}
 	}
@@ -384,6 +387,7 @@ namespace auco{
 			if(player::isPlayEnd()){
 				sensor::resetFarw();
 				sensor::resetBackPole();
+				//setCoord(coord::sheetsExtendPoll,0);
 				pid::psetGain(pid::BY_INWORLD);
 				cont++;
 				time.reset();
