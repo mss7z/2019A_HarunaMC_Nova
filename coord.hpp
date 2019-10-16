@@ -29,6 +29,7 @@ namespace coord{
 	pointc sheetsBom(int);
 	
 	pointc goback(int);
+	pointc gobackByHomew(int);
 };
 
 #endif

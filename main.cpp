@@ -37,11 +37,11 @@ namespace monitor{
 	void loop(){
 		static mylib::regularC pt(500);
 		if(pt.ist()){
-			pc.printf("xenc:%6d yenc:%6d ",sensor::xenc.readRaw(),sensor::yenc.readRaw());
-			pc.printf("target x:%10smm y:%10smm r:%10s ",flt(pid::pidX.read()),flt(pid::pidY.read()),flt(pid::pidR.read()));
+			//pc.printf("xenc:%6d yenc:%6d ",sensor::xenc.readRaw(),sensor::yenc.readRaw());
+			pc.printf("target x:%10smm y:%10smm ",flt(pid::pidX.read()),flt(pid::pidY.read()));
 			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
 			pc.printf("r:%10sdeg BF:%s ",flt(sensor::deg()),(mc::isBlueField() ? "true " : "false"));
-			pc.printf("GN:%s",(sensor::gyro.isNormal() ? "true " : "false"));
+			pc.printf("GN:%s int:%6d ",(sensor::gyro.isNormal() ? "true " : "false"),pid::interval);
 			pc.printf("\n");
 		}/*
 		if(pt.ist()){
@@ -85,7 +85,7 @@ int main(){
 	return 0;*/
 	/*mylib::regularC time(500);
 	while(true){
-		sensor::reviseByBackPole();
+		sensor::reviseByFarw();
 		if(time){
 			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
 			pc.printf("r:%10sdeg BF:%s \n",flt(sensor::deg()),(mc::isBlueField() ? "true " : "false"));

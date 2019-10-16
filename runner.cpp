@@ -6,6 +6,7 @@ namespace sensor{
 	Ticker calcXYtime;
 	mylib::delta<double> dx,dy;
 	static const int readRedUSinterval=40;
+	static const int machineSentor=365;
 	
 	void reviseGyroOwn();
 	//void reviseByRedUS();
@@ -15,7 +16,7 @@ namespace sensor{
 	
 	void setup(){
 		gyro.startDeg();
-		calcXYtime.attach(calcXY,0.05);
+		calcXYtime.attach(calcXY,0.0025);
 		dx.reset();
 		dy.reset();
 	}
@@ -353,12 +354,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=red::revise();
 			if( mm != 0){
-				setX((5600-mm-340)*0.5 + x()*0.5);
+				setX((-5600+mm+machineSentor)*0.5 + x()*0.5);
 			}
 		}else{
 			mm=blue::revise();
 			if( mm != 0){
-				setX((-5600+mm+340)*0.5 + x()*0.5);
+				setX((5600-mm-machineSentor)*0.5 + x()*0.5);
 			}
 		}
 	}
@@ -367,12 +368,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=blue::revise();
 			if( mm != 0){
-				setX((-mm-340)*0.8+x()*0.2);
+				setX((-mm-machineSentor)*0.8+x()*0.2);
 			}
 		}else{
 			mm=red::revise();
 			if( mm != 0){
-				setX((mm+340)*0.8+x()*0.2);
+				setX((mm+machineSentor)*0.8+x()*0.2);
 			}
 		}
 	}
@@ -395,12 +396,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=redPole::revise();
 			if(mm != 0){
-				setX(-4550+mm+340);
+				setX(-4550+mm+machineSentor);
 			}
 		}else{
 			mm=bluePole::revise();
 			if(mm != 0){
-				setX(+4550-mm-340);
+				setX(+4550-mm-machineSentor);
 			}
 		}
 	}
@@ -409,12 +410,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=bluePole::revise();
 			if(mm != 0){
-				setX(-1750-mm-340);
+				setX(-1750-mm-machineSentor);
 			}
 		}else{
 			mm=redPole::revise();
 			if(mm != 0){
-				setX(+1750+mm+340);
+				setX(+1750+mm+machineSentor);
 			}
 		}
 	}
@@ -424,7 +425,7 @@ namespace sensor{
 	void reviseByBackPole(){
 		int mm=backPole::revise();
 		if(mm != 0){
-			setY(6700+mm+340);
+			setY(6700+mm+machineSentor);
 		}
 	}
 	/*
@@ -472,7 +473,8 @@ namespace motor{
 		MTDS,//motor data size
 	};
 	
-	aMt m1(PC_6,PC_8);
+	//aMt m1(PC_6,PC_8);
+	aMt m1(PB_4,PC_8);
 	aMt m2(PC_9,PB_8);
 	aMt m3(PB_3,PA_10);
 	aMt m4(PB_10,PB_5);
@@ -501,6 +503,7 @@ namespace mc{
 	bool isBlueFieldVal=false;
 	
 	void setup(){
+		isBlueFieldVal=fieldSw;
 		pid::setup();
 		out::setup();
 		mt::setup();
@@ -661,6 +664,9 @@ namespace out{
 
 namespace pid{
 	//XY軸の制御を有効にするか
+	int interval=0;
+	Timer t;
+	
 	bool isRunX=false,isRunY=false;
 	const float deltaT=0.02;
 	aPid<float> pidR(0.00008,0.00003,0.00005,deltaT);
@@ -674,6 +680,8 @@ namespace pid{
 	//outと同じ構造につまりsetとactおよびx,y,r変数にすべき?
 	
 	void setup(){
+		t.reset();
+		t.start();
 		psetGain(BY_INWORLD);
 		psetR(sensor::deg());
 		psetX(sensor::x());
@@ -683,7 +691,11 @@ namespace pid{
 	}
 	void loop(){
 		static mylib::regularC pidt((int)(deltaT*1000.0));
+		static int pre=0;
+		int now=t.read_us();
 		if(pidt.ist()){
+			interval=now-pre;
+			pre=now;
 			if(isRunX){
 				pactX();
 			}
@@ -746,21 +758,30 @@ namespace pid{
 			
 			case BY_INWORLD:
 			pidR.setGain(0.00008,0.00003,0.00005);
-			pidX.setGain(0.00006,0.00008,0.000002);
-            pidY.setGain(0.00006,0.00008,0.000002);
+			pidX.setGain(0.00007,0.00008,0.000003);
+            pidY.setGain(0.00007,0.00008,0.000003);
 			break;
 			
 			case BY_OUTWORLD:
 			pidR.setGain(0.00002,0.00000,0.00005);
 			pidX.setGain(0.00001,0.000008,0.00002);
-            pidY.setGain(0.00001,0.000008,0.00002);
+            pidY.setGain(0.00006,0.00008,0.000003);
+			//0.000003,0.000008,0.00000
 			break;
 			
 			case BY_HOMEW:
 			pidR.setGain(0.00008,0.00003,0.00005);
-			pidX.setGain(0.000032,0.000032,0.0000);
-            pidY.setGain(0.00008,0.00008,0.000001);
+			pidX.setGain(0.00003,0.00003,0.0000);
+            pidY.setGain(0.00005,0.00007,0.000003);
+			//0.00006,0.00008
 			break;
+			
+			case BY_FARW:
+			pidR.setGain(0.00003,0.00000,0.00005);
+			pidX.setGain(0.00004,0.000008,0.00002);
+            pidY.setGain(0.00004,0.000008,0.000001);
+			break;
+			//0.00004
 			
 			default:
 			mc::fatalError();

@@ -164,6 +164,8 @@ namespace out{
 }
 
 namespace pid{
+	extern int interval;
+	
 	void setup();
 	void loop();
 	extern aPid<float> pidX,pidY,pidR;
@@ -181,6 +183,7 @@ namespace pid{
 		BY_INWORLD,
 		BY_OUTWORLD,
 		BY_HOMEW,
+		BY_FARW,
 	};
 	
 	void psetGain(gainMode);
