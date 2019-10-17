@@ -86,6 +86,8 @@ namespace sensor{
 	
 	void resetBackPole();
 	void reviseByBackPole();
+	
+	void reviseByBackPoleTshirt();
 }
 
 namespace motor{

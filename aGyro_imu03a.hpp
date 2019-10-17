@@ -31,7 +31,7 @@ class a_imu03a{
 		DigitalOut cs;
 		Ticker tc;
 		
-		static const int deltaT=1*1000;//us
+		static const int deltaT=700;//us
 		
 		void comS(){
 			cs=0;

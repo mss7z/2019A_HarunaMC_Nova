@@ -317,11 +317,15 @@ namespace auco{
 			if(player::isPlayEnd()){
 				player::set(coord::towel1);
 				pid::psetGain(pid::BY_INWORLD);
+				sensor::resetBackPole();
 				cont++;
 			}
 			break;
 			
 			case 2:
+			if((1400<sensor::x() && sensor::x()<1700) || (-1400>sensor::x() && sensor::x()>-1700)){
+				sensor::reviseByBackPoleTshirt();
+			}
 			if(player::isPlayEnd()){
 				time.reset();
 				time.start();

@@ -187,8 +187,8 @@ namespace sensor{
 			return false;
 		}
 		void reviseDeg(){
-			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/200.0))/M_PI;
-			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+			float newDeg=-(180.0*atan((redus::blueb.readMM()-redus::bluef.readMM())/186.0))/M_PI;
+			gyro.setDeg( newDeg*0.8 + gyro.getDeg()*0.2 );
 		}
 		int readMM(){
 			return (redus::blueb.readMM()+redus::bluef.readMM())/2;
@@ -234,8 +234,8 @@ namespace sensor{
 			return false;
 		}
 		void reviseDeg(){
-			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/200.0))/M_PI;
-			gyro.setDeg( newDeg*0.5 + gyro.getDeg()*0.5 );
+			float newDeg=-(180.0*atan((redus::redf.readMM()-redus::redb.readMM())/186.0))/M_PI;
+			gyro.setDeg( newDeg*0.8 + gyro.getDeg()*0.2 );
 		}
 		void reset(){
 			redus::redf.reset();
@@ -354,12 +354,12 @@ namespace sensor{
 		if(mc::isBlueField()){
 			mm=red::revise();
 			if( mm != 0){
-				setX((-5600+mm+machineSentor)*0.5 + x()*0.5);
+				setX((-5600+mm+machineSentor)*0.6 + x()*0.4);
 			}
 		}else{
 			mm=blue::revise();
 			if( mm != 0){
-				setX((5600-mm-machineSentor)*0.5 + x()*0.5);
+				setX((5600-mm-machineSentor)*0.6 + x()*0.4);
 			}
 		}
 	}
@@ -426,6 +426,12 @@ namespace sensor{
 		int mm=backPole::revise();
 		if(mm != 0){
 			setY(6700+mm+machineSentor);
+		}
+	}
+	void reviseByBackPoleTshirt(){
+		int mm=backPole::revise();
+		if(mm != 0){
+			setY(4700+mm+machineSentor);
 		}
 	}
 	/*
@@ -765,7 +771,7 @@ namespace pid{
 			case BY_OUTWORLD:
 			pidR.setGain(0.00002,0.00000,0.00005);
 			pidX.setGain(0.00001,0.000008,0.00002);
-            pidY.setGain(0.00006,0.00008,0.000003);
+            pidY.setGain(0.00007,0.00008,0.000003);
 			//0.000003,0.000008,0.00000
 			break;
 			
