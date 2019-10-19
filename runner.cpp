@@ -521,6 +521,7 @@ namespace mc{
 			isBlueFieldVal=fieldSw;
 			//pc.printf("hey!\n");
 			static int cont=0;
+			//if()
 			if(cont<12){
 				if(isBlueFieldVal){
 					tl=0xBF1140A2;
@@ -770,7 +771,7 @@ namespace pid{
 			
 			case BY_OUTWORLD:
 			pidR.setGain(0.00002,0.00000,0.00005);
-			pidX.setGain(0.00001,0.000008,0.00002);
+			pidX.setGain(0.000006,0.000008,0.00002);
             pidY.setGain(0.00007,0.00008,0.000003);
 			//0.000003,0.000008,0.00000
 			break;

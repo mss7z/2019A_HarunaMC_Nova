@@ -85,7 +85,7 @@ int main(){
 	return 0;*/
 	/*mylib::regularC time(500);
 	while(true){
-		sensor::reviseByFarw();
+		sensor::reviseByBackPole();
 		if(time){
 			pc.printf("x: %10smm y:%10smm ",flt(sensor::x()),flt(sensor::y()));
 			pc.printf("r:%10sdeg BF:%s \n",flt(sensor::deg()),(mc::isBlueField() ? "true " : "false"));
