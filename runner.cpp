@@ -507,6 +507,7 @@ namespace mt=motor;
 namespace mc{
 	DigitalIn fieldSw(PB_15);
 	bool isBlueFieldVal=false;
+	bool isEmerg=false;
 	
 	void setup(){
 		isBlueFieldVal=fieldSw;
@@ -521,19 +522,22 @@ namespace mc{
 			isBlueFieldVal=fieldSw;
 			//pc.printf("hey!\n");
 			static int cont=0;
-			//if()
-			if(cont<12){
-				if(isBlueFieldVal){
-					tl=0xBF1140A2;
+			if(!isEmerg){
+				if(cont<12){
+					if(isBlueFieldVal){
+						tl=0xBF1140A2;
+					}else{
+						tl=0xBFFF3255;
+					}
+				}else if(cont<24){
+					if(mt::isOut()){
+						tl=0xBF3EB370;
+					}
 				}else{
-					tl=0xBFFF3255;
-				}
-			}else if(cont<24){
-				if(mt::isOut()){
-					tl=0xBF3EB370;
+					cont=0;
 				}
 			}else{
-				cont=0;
+				tl=0x00000000;
 			}
 			cont++;
 			//tl=0xff;
@@ -566,6 +570,9 @@ namespace mc{
 	}
 	bool isBlueField(){
 		return isBlueFieldVal;
+	}
+	void emergIs(bool is){
+		isEmerg=is;
 	}
 }
 

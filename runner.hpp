@@ -154,6 +154,8 @@ namespace mc{
 	
 	void setBlueField(bool);
 	bool isBlueField();
+	
+	void emergIs(bool);
 }
 
 namespace out{

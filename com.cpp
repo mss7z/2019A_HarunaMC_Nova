@@ -195,6 +195,7 @@ namespace emergency{
 				//mt::isStop=isEmerg;
 				mt::emergStopIs(isEmerg);
 				auco::emergIs(isEmerg);
+				mc::emergIs(isEmerg);
 			}
 		}/*else{
 			pc.printf("cmd %c %c",(char)data[12],(char)data[13]);
